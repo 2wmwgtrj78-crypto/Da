@@ -1,0 +1,1732 @@
+/* Dakshinamurthy stylesheet — pruned in 6.4.0.
+
+   579 whole rules and 648 individual selectors were removed: every selector
+   that can never match any element the app renders. 26.9% of the file.
+
+   HOW LIVENESS WAS DECIDED — do not repeat this by reading the file.
+   Three independent sources, because the first two each produced false
+   positives on their own:
+     1. Every identifier in the shipped JS/HTML.
+     2. Every class observed at runtime across 48 states. This is not
+        optional: t-amber, t-drape, sm-health-ok and l0 are built by
+        concatenation and a source-only scan marked all four dead.
+     3. document.querySelector() for each remaining candidate, in the browser,
+        across 48 states with every <details> forced open and in-page controls
+        clicked. Of 464 candidates, exactly 1 matched anything.
+
+   HOW IT WAS VERIFIED. Full-page pixel hashes were tried first and rejected:
+   capturing the SAME build twice produced 15 differing states out of 48, so
+   the app's own rendering is not deterministic (time-dependent content) and
+   pixel diffing proves nothing here. The working method hot-swaps the
+   stylesheet on an already-rendered page — same DOM, same instant — and
+   compares the computed values of 34 properties on every element. Result: 0
+   changes across 48 states. Control: breaking one live nav rule made it
+   report all 48. See tests/ and FINAL_QA_REPORT.
+
+   If you delete more, use that harness, not your judgement about a name. */
+
+/*
+ * Dakshinamurthy UI stylesheet — v30
+ *
+ * Single source of truth for presentation. The historical sections are retained
+ * intentionally so visual behavior is preserved while maintenance happens in one file.
+ */
+
+:root{--panel2:#1D282E;--line2:#374A53; ; ; ; --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; --serif:Georgia,'Iowan Old Style','Times New Roman',serif}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{font-family:var(--sans);font-size:20px;line-height:1.5; padding:18px 14px calc(84px + env(safe-area-inset-bottom));max-width:760px;margin:0 auto}
+p{margin:0 0 6px}
+.h1{font-family:var(--serif)}
+.h2{font-family:var(--serif);margin-bottom:6px}
+.big2{font-family:var(--serif);line-height:1.1}
+.big3{font-family:var(--serif);font-size:24px;line-height:1.1}
+.eyebrow{text-transform:uppercase}.sm{font-size:17px;line-height:1.6}
+.mb{margin-bottom:11px}
+/* Buttons inside a card were sitting flush against the text above them, which
+   made long cards read as one undifferentiated block. */
+.card .btnrow{margin-top:11px}
+.card .btnrow:first-child{margin-top:0}
+.card.t-amber{border-color:var(--amber)}
+.card.t-drape{border-color:var(--drape)}
+.row-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:6px}
+.lbl{font-weight:600}
+.fill{height:100%;transition:width .3s}
+.btn{border:1px solid var(--line2); padding:11px 14px;cursor:pointer}
+.btn.sm{padding:7px 11px;font-size:17px}
+.btn.f1{flex:1}
+.btnrow{display:flex;flex-wrap:wrap;margin-top:8px}
+.g2{display:grid;grid-template-columns:1fr 1fr}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr}
+.topline{border-top:1px solid var(--line);padding-top:12px;margin-top:12px}
+.seg{display:flex;gap:6px;margin:12px 0 8px}
+.segb{flex:1;border:1px solid var(--line);border-radius:10px;padding:9px 6px;font:500 12.5px var(--sans);cursor:pointer}
+.segb.on{ ;font-weight:700}
+.pick{border:1px solid var(--line);border-radius:9px;padding:10px 8px;font:500 12px var(--sans);cursor:pointer;text-align:left;line-height:1.35}
+.pick.on{ ;font-weight:700}
+select,textarea,input[type=date]{border:1px solid var(--line2); border-radius:9px;padding:9px 10px;font:18.5px var(--sans);width:100%;resize:vertical}
+select{width:auto}
+textarea{margin-bottom:4px}
+textarea.mono{font:16px ui-monospace,Menlo,monospace;color:var(--muted)}
+.ctl{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.val{font-family:var(--serif);font-size:22px}
+.prow{padding:12px 0;border-top:1px solid var(--line)}
+.prow:first-child{border-top:none}
+.trow{padding:10px 0;border-top:1px solid var(--line)}
+.trow:first-child{border-top:none}
+.chk{display:flex;gap:11px;padding:11px 0;border-top:1px solid var(--line);cursor:pointer}
+.chk:first-of-type{border-top:none}
+.box{border-radius:6px;flex-shrink:0;margin-top:2px;font-size:17px;font-weight:900;text-align:center;cursor:pointer}
+.tl{margin-top:4px}
+.tr{display:flex;gap:10px;align-items:stretch}
+.tr.dim{opacity:.7}
+.tt{flex-shrink:0; ;color:var(--muted);font-variant-numeric:tabular-nums}
+.tb{border-radius:2px;flex-shrink:0}
+.tc{flex:1;padding-bottom:9px;min-width:0}
+.blk{padding:11px 12px}
+.bh{display:flex;gap:10px;align-items:flex-start}
+.bt{flex:1;cursor:pointer;min-width:0}
+.meta{color:var(--muted);display:flex;flex-wrap:wrap}
+.hd{display:flex;justify-content:space-between;gap:10px}
+.hdr{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.cd{text-align:center;flex-shrink:0;border:1px solid var(--line); border-radius:12px;padding:7px 11px}
+.cdn{font-family:var(--serif);font-size:27px;line-height:1;color:var(--amber)}
+.cdl{font-size:14.5px;color:var(--muted);line-height:1.25;margin-top:3px}
+.dayhd{display:flex;gap:14px;align-items:center;border:1px solid var(--line);padding:13px;margin-bottom:12px}
+.dinfo{flex:1;min-width:0}
+.ring{flex-shrink:0}
+.rt{fill:var(--bone);font:600 15px var(--sans)}
+text.rs{fill:var(--muted);font:400 9px var(--sans)}
+.seg.sm2{margin:8px 0 0}
+.seg.sm2 .segb{padding:6px 4px;font-size:16.5px}
+.ic{width:15px;height:15px;vertical-align:-2px;margin-right:5px}
+.chev{color:var(--muted);font-size:24px;line-height:1;padding:2px 2px 2px 8px;cursor:pointer;
+transition:transform .2s;flex-shrink:0}
+.prot{padding:9px 0;font-size:18px;color:var(--muted)}
+.cf{flex:1;min-width:0}
+.strip2{display:flex;margin:0 0 12px}
+.chip{flex:1;display:flex;justify-content:space-between;align-items:center;gap:8px;border:1px solid var(--line);padding:11px 13px; cursor:pointer;font-family:var(--sans)}
+.chl{font-size:18px;color:var(--muted)}
+.chv{font-family:var(--serif);font-size:22px}
+.btop{font-weight:600;line-height:1.35}
+.rs{padding:11px 0;border-top:1px solid var(--line)}
+.rs:first-child{border-top:none}
+.pillq{font-size:16px;font-weight:700;background:var(--panel2);border:1px solid var(--line2);
+border-radius:99px;padding:2px 9px;white-space:nowrap}
+.heat{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.ht{aspect-ratio:1;border-radius:6px;display:flex;align-items:center;justify-content:center}
+.ht span{font-size:14.5px;font-weight:800;color:#08100E;opacity:.75;letter-spacing:.3px}
+.legend{display:flex;align-items:center;gap:4px;font-size:14.5px;color:var(--muted);
+margin-top:9px;flex-wrap:wrap}
+.lg{width:11px;height:11px;border-radius:3px;display:inline-block;margin-left:7px}
+.legend .lg:first-child{margin-left:0}
+.mgr{padding:9px 0;border-top:1px solid var(--line)}
+.mgr:first-child{border-top:none}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(9px,1fr));gap:3px}
+.ac{aspect-ratio:1;border-radius:2px;background:var(--line)}
+.exr{padding:11px 0;border-top:1px solid var(--line)}
+.exr:first-child{border-top:none}
+.ydot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.sky{color:var(--sky)}
+nav{position:fixed;right:0;display:flex; border-top:1px solid var(--line);z-index:9}
+.pick.lg{min-height:58px;font-size:21px;font-weight:650}
+.caldow{text-align:center;font-size:14.5px;padding:2px 0}
+.calcell{border:1px solid transparent;border-radius:8px;padding:5px 0 4px; display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer}
+.calcell.sel{border-color:var(--drape);background:rgba(255,192,46,.12)}
+.calcell.tdy .caln{font-weight:800;color:var(--bone)}
+.caln{font-size:17px;line-height:1}
+.callbl{font-size:14.5px;line-height:1.1;text-align:center;opacity:.85}
+.caldot{width:5px;height:5px;border-radius:99px}
+/* Superseded by the vertical .msc-* column classes below \u2014 horizontal bars
+   (.msbar/.msfill/.ms.*) were removed from the markup when the Progress
+   section moved to longitudinal columns; their CSS is removed here too
+   rather than left as dead weight nothing references. */
+/* Columns: sized so 3 fit comfortably in a row (headline metrics) or 7 in a
+   wrapped row (phases) on a ~320px usable width, each with its own label
+   below rather than a shared axis, since the labels differ in length and a
+   shared axis would force them to truncate to the shortest one. */
+.mscrow{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-around;margin-top:10px}
+.msc{display:flex;flex-direction:column;align-items:center;width:64px;text-align:center}
+.msc[role="button"]{cursor:pointer}
+.msc-col{position:relative;width:30px;height:130px;background:var(--ink);border-radius:8px;
+  border:1px solid var(--line);overflow:hidden}
+.msc-fill{position:absolute;bottom:0;left:0;width:100%;border-radius:0 0 7px 7px;transition:height .3s}
+.msc-mk{position:absolute;left:0;height:1px;background:var(--line2)}
+.msc-mk.fine{width:22%;opacity:.4}
+.msc-mk.mid{width:48%;opacity:.65}
+.msc-mk.major{width:100%;height:2px;opacity:.9}
+.msc-pct{font-size:18.5px;font-weight:800;margin-top:6px}
+.msc-lbl{font-size:14.5px;color:var(--muted);line-height:1.25;margin-top:2px;min-height:24px}
+.msc-sub{font-size:14.5px;opacity:.8}
+.subbar{display:flex;height:22px;border-radius:8px;overflow:hidden;margin-top:8px;
+  border:1px solid var(--line);background:var(--ink)}
+.topseg{position:relative;height:100%;background:rgba(255,255,255,.05);overflow:visible}
+.topseg[data-edge="1"]{border-left:1px solid rgba(0,0,0,.35)}
+.topsegfill{position:absolute;left:0;top:0;height:100%;opacity:.9}
+/* Kept within the segment's own bounds rather than overhanging past it,
+   since .subbar clips overflow to keep its rounded corners \u2014 an overhang
+   would have been silently cut off by the parent, invisible rather than
+   just less prominent. */
+.ticks{display:flex;flex-wrap:wrap;gap:5px;margin:4px 0 2px}
+.tick{font-size:14.5px;background:var(--ink);border-radius:4px;padding:1px 5px;opacity:.8}
+/* Six tabs on a phone is a lot of small targets. The active one gets a colour
+   change, a weight change, a top rule AND a faint tinted background — four
+   redundant signals, because on a 40px-wide target with 11.5px text a single
+   one is easy to miss at a glance. */
+#badge{position:absolute; ; ; border-radius:99px;font-size:14.5px;font-weight:800;padding:1px 5px}
+#saveWarn{margin-bottom:10px}
+.jumprow{display:flex;justify-content:space-between;align-items:center;padding:2px 2px 10px;position:sticky;top:0;background:var(--ink);z-index:5}
+.jumpd{font-size:17px;color:var(--muted)}
+.jumplink{font-size:17px;text-decoration:none;font-weight:600;white-space:nowrap;padding-left:10px}
+.coachMore summary{list-style:none}
+.coachMore summary::-webkit-details-marker{display:none}
+.eyebrow{font-size:15px;margin:16px 0 9px}
+.lbl{font-size:20px;line-height:1.35}
+.box{width:22px;height:22px;line-height:19px}
+.tc .blk{padding:12px 13px}
+.bt{padding:1px 0}
+.meta{font-size:17px;margin-top:5px;gap:9px}
+.tt{width:46px;font-size:17px;padding-top:13px}
+.tb{width:4px}
+.btop{font-size:18.5px;margin-top:3px}
+.pick{font-size:18px}
+.big2{font-size:29.5px}
+@media(prefers-reduced-motion:reduce){*{transition:none}}
+
+/* V21 information architecture: five clear destinations. */
+.sm-v21-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sm-v21-tile{display:flex;gap:11px;align-items:center;padding:14px;border-radius:16px;background:linear-gradient(145deg,#42171D,#351116);border:1px solid rgba(214,164,65,.2);min-height:82px}
+.sm-v21-tile .ico{width:34px;height:34px;border-radius:12px;display:grid;place-items:center;background:rgba(214,164,65,.1);color:#F2C45C;flex:0 0 auto}
+.sm-v21-tile .ico svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+@media(max-width:420px){.sm-v21-grid{gap:8px}.sm-v21-tile{padding:12px;min-height:76px}}
+
+/* V23 visual learning system: subject cards use recognisable medical illustrations,
+   not emoji-only labels. The art is inline/local so it survives offline/PWA use. */
+.sm-v23-art{width:86px;height:86px;flex:0 0 86px;border-radius:22px;display:grid;place-items:center;background:linear-gradient(145deg,#42171D,#22080C);border:1px solid rgba(242,196,92,.38);box-shadow:0 10px 24px rgba(0,0,0,.18);overflow:hidden}
+.sm-v23-art svg{width:68px;height:68px;fill:none;stroke:#F2C45C;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.sm-v23-art .soft{stroke:#D8C8BD}.sm-v23-art .fill{fill:#D6A441;stroke:none}
+@media(max-width:520px){.sm-v23-art{width:72px;height:72px;flex-basis:72px;border-radius:18px}.sm-v23-art svg{width:56px;height:56px}}
+
+:root{/* Palette taken from the icon artwork itself (sampled: #770c08 deep maroon, #fc7308 orange, #2b0301 near-black red). Red/orange/yellow is a hot, high-energy scheme \u2014 which creates one real problem worth naming: red and amber are the app's WARNING and URGENT colours, and if the whole interface is warm they stop signalling anything. Resolved by keeping the CHROME dark and warm-tinted while reserving saturated red for genuine urgency only, and giving "good" a distinct yellow-gold rather than another orange. */ --ink:#170603; /* near-black, warm */ ; --paper:#240905; --card:#33100a; --line2:#7a3418; /* warm off-white text */ ; /* warm muted, still high contrast on dark */ ; /* GOOD / progress \u2014 gold, distinct from orange */ ; /* neutral accent / AI \u2014 orange */ ; /* WARNING */ ; /* URGENT \u2014 the only fully saturated red */ /* Dedicated to the progress bar's phase/topic columns specifically. They were using --violet, which in THIS palette is #ff6a2a \u2014 itself another orange, barely distinguishable from --sky and --amber sitting right next to it on the same page. A cool cyan gives real contrast against the warm red/orange/gold scheme everywhere else, rather than reusing --violet globally, which would also recolour the calendar's rest-day dot and the lecture slice on the time-allocation donut \u2014 neither of which was asked for. */ --prog:#22d3c8}
+.card,.blk,.box,.tc .blk{ border:1px solid #293652}
+h1,.h1{letter-spacing:-.6px}
+button,.btn{
+  border-radius:12px!important;
+}
+button:hover{filter:brightness(1.08)}
+nav{ ; ; ; ; }
+select,textarea,input{ ; border-radius:10px}
+@media(min-width:900px){
+  #app{padding-top:30px}
+}
+
+/* V16 visual system: maroon brand chrome, gold action/progress, warm-ivory study.
+   The mode changes atmosphere and reading surface only; scheduling/data logic is untouched. */
+:root{ --sm-card2:#42171D; --sm-gold2:#F2C45C; --sm-cream:#FFF4E6; --sm-soft:#D8C8BD; ; --sm-attn:#E9A23B; }
+/* Calm reading surface */
+body[data-sm-mode="study"] .card,
+body[data-sm-mode="study"] .blk,
+body[data-sm-mode="study"] .box,
+body[data-sm-mode="study"] .tc .blk{background:#FFFDFC;color:#24181A;border-color:#DED3CA!important;box-shadow:0 8px 26px rgba(52,32,24,.07)}
+body[data-sm-mode="study"] .muted,
+body[data-sm-mode="study"] .sm-v10-k,
+body[data-sm-mode="study"] .sm-v10-s,
+body[data-sm-mode="study"] .sm-v14-eyebrow,
+body[data-sm-mode="study"] .sm-v14-scale,
+body[data-sm-mode="study"] .sm-v14-legend{color:#62565A!important}
+body[data-sm-mode="study"] .btn{background:#F2ECE6!important;color:#24181A!important;border-color:#CFC2B8!important}
+body[data-sm-mode="study"] .btn.solid{background:linear-gradient(135deg,#D6A441,#F2C45C)!important;color:#24181A;border-color:#D6A441!important}
+body[data-sm-mode="study"] select,body[data-sm-mode="study"] textarea,body[data-sm-mode="study"] input{background:#FFFDFC;color:#24181A;border-color:#CFC2B8}
+/* Night mode: lower visual intensity while preserving the same semantic colours. */
+body[data-sm-mode="night"] .card,body[data-sm-mode="night"] .blk,body[data-sm-mode="night"] .box,body[data-sm-mode="night"] .tc .blk{background:#1B0D10!important;border-color:#3A2025!important}
+body[data-sm-mode="night"] .muted{color:#B7A7A0}
+body[data-sm-mode="night"] .btn{background:#241317!important;border-color:#493039!important}
+/* Brand strip */
+.sm-v16-brand{ ; ; }
+.sm-v16-brand img{ ;flex:0 0 auto}
+.sm-v16-brand-name{font-family:Georgia,'Times New Roman',serif}
+.sm-v16-brand-sub{text-transform:uppercase;margin-top:4px;font-weight:800}
+.sm-v16-brand-mode{margin-left:auto;font-weight:800; ;border:1px solid rgba(242,196,92,.35)}
+/* Stronger hierarchy: gold means action/progress; semantic colours stay distinct. */
+.btn.solid{ }
+/* Make the progress hero feel like the visual anchor, without adding another metric. */
+/* Visual-mode control */
+.sm-v16-modes{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:9px}
+.sm-v16-mode{min-height:48px;border:1px solid #7A635A;border-radius:12px;background:#2A1115;color:#FFF4E6;padding:8px 6px;font:700 11px var(--sans);cursor:pointer;text-align:center}
+.sm-v16-mode span{display:block;font-size:14.5px;font-weight:500;color:#C9B8AE;margin-top:2px}
+.sm-v16-mode.on{background:linear-gradient(135deg,#4A1A22,#351116);border-color:#D6A441;color:#F2C45C;box-shadow:inset 0 0 0 1px rgba(242,196,92,.18)}
+body[data-sm-mode="study"] .sm-v16-mode{background:#F3EEE8;color:#24181A;border-color:#CFC2B8}
+body[data-sm-mode="study"] .sm-v16-mode span{color:#62565A}
+body[data-sm-mode="study"] .sm-v16-mode.on{background:#FFF4E6;border-color:#D6A441;color:#8A641A}
+body[data-sm-mode="night"] .sm-v16-mode{background:#1B0D10;border-color:#493039}
+/* Better small status language */
+.sm-v16-reading-note{display:flex;align-items:flex-start;gap:8px;margin-top:9px;padding:9px 10px;border-radius:11px;background:rgba(214,164,65,.08);border:1px solid rgba(214,164,65,.18);font-size:16px;line-height:1.4;color:#D8C8BD}
+body[data-sm-mode="study"] .sm-v16-reading-note{background:#F7F0E9;border-color:#E0D2C7;color:#62565A}
+@media(max-width:420px){.sm-v16-brand{padding:8px 9px}.sm-v16-brand-mode{font-size:14.5px}.sm-v16-modes{gap:5px}}
+
+#sm8BootError{display:none;margin:22px auto;max-width:720px;padding:18px;border:1px solid #8b3a2f;border-radius:16px;background:#2b0b07;color:#fff3e6;font:21px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}#sm8BootError b{color:#ffc02e}#sm8BootError code{display:block;margin-top:10px;white-space:pre-wrap;word-break:break-word;color:#ffd7c2}
+
+.sm-state{margin:0 0 14px;padding:14px;border:1px solid var(--bone);border-radius:16px;background:var(--panel);box-shadow:0 8px 24px rgba(0,0,0,.08)}
+.sm-state .sm-state-title{font-weight:700;font-size:21px;margin-bottom:4px}
+.sm-state .sm-state-sub{font-size:18.5px;line-height:1.45;color:var(--muted);margin-bottom:10px}
+.sm-state-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
+.sm-state-btn{border:1px solid var(--bone);background:transparent;border-radius:12px;padding:9px 6px;font:inherit;font-size:17px;line-height:1.15;color:var(--bone);cursor:pointer;min-height:48px}
+.sm-state-btn.on{background:var(--drape);color:var(--panel);border-color:var(--drape);font-weight:700}
+.sm-state-note{margin-top:10px;padding:10px 11px;border-radius:12px;background:rgba(56,142,60,.10);font-size:18.5px;line-height:1.45}
+@media(max-width:420px){.sm-state-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}\n@media(max-width:420px){.sm-v10-grid{grid-template-columns:1fr 1fr}.sm-v10-v{font-size:23px}}\n
+
+/* V13: make the primary syllabus trajectory unmistakable without adding another dashboard. */
+@media(max-width:420px){}
+
+.sm-v14-progress{margin:0 0 14px;padding:18px; }
+.sm-v14-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}.sm-v14-eyebrow{font-size:17px;text-transform:uppercase;letter-spacing:.1em;font-weight:800}.sm-v14-pct{font-size:46px;line-height:.95;font-weight:950;letter-spacing:-2px;margin-top:5px}.sm-v14-pct span{font-size:26px;margin-left:2px}.sm-v14-status{font-size:16px;font-weight:850;padding:7px 10px;border-radius:999px;border:1px solid rgba(255,192,46,.5);white-space:nowrap}.sm-v14-track{position:relative;margin:18px 4px 0;border:1px solid #394b6a;border-radius:999px;overflow:visible}.sm-v14-fill{height:100%;border-radius:999px; ;transition:width .4s ease}.sm-v14-marker{position:absolute;top:-5px;height:30px;width:2px;opacity:.95;z-index:2}.sm-v14-you{position:absolute;top:-7px;width:34px;height:34px;border-radius:50%;border:3px solid #11192a;transform:translateX(-50%);z-index:3}.sm-v14-dotlabel{position:absolute;top:32px;transform:translateX(-50%);font-size:14.5px;white-space:nowrap}.sm-v14-scale{display:flex;justify-content:space-between;margin:20px 1px 0;font-size:14.5px}.sm-v14-next{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:15px;padding:12px 13px;border:1px solid rgba(255,192,46,.28);border-radius:14px}.sm-v14-next strong{font-size:20px}.sm-v14-next small{display:block;font-size:16px;line-height:1.35;margin-top:3px}.sm-v14-chip{flex:0 0 auto;border-radius:999px;padding:6px 9px; ;font-size:16px;font-weight:900}.sm-v14-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:9px}.sm-v14-stat{padding:9px 8px;border-radius:12px;border:1px solid rgba(255,255,255,.08)}.sm-v14-stat b{display:block;font-size:22px}.sm-v14-stat span{display:block;font-size:14.5px;margin-top:2px;line-height:1.25}.sm-v14-legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px;font-size:14.5px}.sm-v14-key{display:inline-flex;align-items:center;gap:5px}.sm-v14-key i{width:9px;height:9px;border-radius:50%;display:inline-block}.sm-v14-key .a{background:var(--drape)}.sm-v14-key .b{background:#fff}.sm-v14-key .c{background:var(--sky)}.sm-v14-details{margin-top:9px}.sm-v14-details summary{cursor:pointer;font-size:16px;font-weight:750}.sm-v14-minirow{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:9px}.sm-v14-mini{padding:9px;border-radius:12px;border:1px solid var(--line2)}.sm-v14-mini b{font-size:20px}.sm-v14-mini span{display:block;font-size:14.5px;margin-top:2px}@media(max-width:420px){.sm-v14-pct{font-size:41.5px}.sm-v14-stats{gap:5px}.sm-v14-stat{padding:8px 6px}}
+
+/* SurgiMaster V18 — visual language: premium medical education, not dashboard clutter. */
+:root{--sm-maroon2:#351116;--sm-maroon3:#42171D;--sm-gold2:#F2C45C; ;--sm-green:#55B98A;--sm-amber:#E9A23B;--sm-red:#D66A6A;--sm-blue:#7EA6D8}
+#badge{top:3px;left:50%;margin-left:12px;background:var(--sm-red);color:#fff;box-shadow:0 0 0 2px #22080C}
+
+/* Brand becomes a calm masthead rather than another information card. */
+.sm-v16-brand{overflow:hidden; ;border-color:rgba(214,164,65,.42)}
+.sm-v16-brand:after{content:"";position:absolute;right:-38px;top:-48px;width:120px;height:120px;border-radius:50%;border:1px solid rgba(242,196,92,.16);box-shadow:0 0 0 14px rgba(242,196,92,.035),0 0 0 28px rgba(242,196,92,.025);pointer-events:none}
+.sm-v16-brand img{ }
+
+/* Signature progress treatment: journey, not spreadsheet. */
+.sm-v14-progress{border-radius:22px;border-color:rgba(214,164,65,.55)}
+.sm-v14-track{height:22px}
+.sm-v14-fill{background:linear-gradient(90deg,#D6A441,#F2C45C);box-shadow:0 0 20px rgba(242,196,92,.38)}
+.sm-v14-you{background:var(--sm-gold2);box-shadow:0 3px 15px rgba(242,196,92,.52)}
+
+/* Premium icon chips for key actions, auto-applied by V17 JS. */
+.sm-v17-iconchip{width:34px;height:34px;flex:0 0 34px;border-radius:11px;display:inline-flex;align-items:center;justify-content:center;background:rgba(214,164,65,.11);border:1px solid rgba(214,164,65,.28);color:var(--sm-gold2)}
+.sm-v17-iconchip svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+
+/* Study mode: the app should visually disappear and the knowledge should take over. */
+body[data-sm-mode="study"] .sm-v16-brand{background:linear-gradient(135deg,#FFF4E6,#FFFDFC);border-color:#D6A441;box-shadow:0 10px 26px rgba(52,32,24,.08)}
+body[data-sm-mode="study"] .sm-v16-brand-name{color:#24181A}
+body[data-sm-mode="study"] .sm-v16-brand-sub{color:#8A641A}
+body[data-sm-mode="study"] .sm-v16-brand-mode{color:#8A641A!important;border-color:#D6A441!important}
+body[data-sm-mode="study"] .sm-v14-progress{background:linear-gradient(145deg,#FFF8F0,#FFFDFC);border-color:#D6A441;box-shadow:0 12px 28px rgba(52,32,24,.08)}
+body[data-sm-mode="study"] .sm-v14-pct,body[data-sm-mode="study"] .sm-v14-next strong,body[data-sm-mode="study"] .sm-v14-stat b{color:#24181A}
+body[data-sm-mode="study"] .sm-v14-track{background:#F1E9E1;border-color:#D9C8BB}
+body[data-sm-mode="study"] .sm-v14-you{border-color:#FFFDFC}
+body[data-sm-mode="study"] #badge{box-shadow:0 0 0 2px #FFFDFC}
+
+/* Night mode keeps the identity but removes visual glare. */
+body[data-sm-mode="night"] .sm-v16-brand{background:linear-gradient(135deg,#281014,#120709);border-color:#4A2830}
+body[data-sm-mode="night"] .sm-v14-progress{background:linear-gradient(145deg,#281014,#120709 75%);border-color:#5B353D}
+
+/* Micro-illustration dividers for major sections. */
+
+/* Less boxy cards: consistent depth and a single focal edge. */
+.card .h2{letter-spacing:-.15px}
+@media(max-width:420px){.sm-v16-brand-name{font-size:24px}.sm-v14-progress{padding:16px}}
+@media(prefers-reduced-motion:reduce){.sm-v14-fill{transition:none}}
+
+/* V19 — visual identity pass: hybrid premium, visual aids, surgical line-art, and persistent Om signature. */
+.sm-v18-om{position:fixed;z-index:9998;top:calc(10px + env(safe-area-inset-top));right:12px;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-sizing:border-box;background:radial-gradient(circle at 35% 30%,rgba(242,196,92,.20),rgba(53,17,22,.96) 70%);border:1px solid rgba(242,196,92,.62);box-shadow:0 5px 18px rgba(0,0,0,.24),0 0 16px rgba(242,196,92,.12),inset 0 0 0 2px rgba(255,244,230,.05);color:#F2C45C;font-family:Georgia,'Times New Roman',serif;font-size:29px;line-height:1;text-decoration:none;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);pointer-events:none;user-select:none}
+.sm-v18-om:after{content:"";position:absolute;inset:4px;border-radius:50%;border:1px solid rgba(242,196,92,.16)}
+body[data-sm-mode="study"] .sm-v18-om{background:rgba(255,253,250,.96);color:#7B1828;border-color:#D6A441;box-shadow:0 4px 15px rgba(52,32,24,.10),inset 0 0 0 2px rgba(123,24,40,.04)}
+body[data-sm-mode="night"] .sm-v18-om{background:rgba(18,7,9,.96);color:#D6A441;border-color:#5B353D;box-shadow:0 4px 14px rgba(0,0,0,.35)}
+@media(max-width:420px){.sm-v18-om{width:35px;height:35px;right:10px;font-size:27px}}
+@media(prefers-reduced-motion:reduce){.sm-v18-om{transition:none}}
+
+/* V19 — richer visual language: emblem, surgical line-art, glass depth, and visual rhythm. */
+:root{--sm19 ;--sm19-wine2:#351116;--sm19-wine3:#42171D;--sm19 ;--sm19-gold2:#F2C45C;--sm19 ;--sm19}
+body:after{content:"";position:fixed;inset:auto -90px 52px auto;width:260px;height:260px;border-radius:50%;pointer-events:none;opacity:.14;background:radial-gradient(circle,rgba(242,196,92,.45),transparent 66%);filter:blur(10px);z-index:-1}
+body:before{content:"";position:fixed;left:-12px;bottom:48px;width:250px;height:150px;opacity:.055;pointer-events:none;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 250 150'%3E%3Cpath d='M0 137L45 82l28 34 40-67 30 38 36-55 71 105z' fill='none' stroke='%23F2C45C' stroke-width='2'/%3E%3Cpath d='M112 134c24-20 38-33 51-43 19-14 30-22 52-39' fill='none' stroke='%23F2C45C' stroke-width='2.5' stroke-linecap='round'/%3E%3Ccircle cx='212' cy='24' r='12' fill='none' stroke='%23F2C45C' stroke-width='1.5'/%3E%3C/svg%3E") bottom left/contain no-repeat;z-index:-1}
+#app{position:relative}
+#app:before{content:"";position:fixed;right:-25px;top:105px;width:170px;height:210px;opacity:.055;pointer-events:none;background:
+ url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 170 210'%3E%3Cpath d='M18 185C42 137 51 103 43 22M44 137c31-7 56-29 82-72M53 109c-22-10-35-28-39-54M68 88c22 8 43 6 65-7M81 61c-9-19-8-34-2-48' fill='none' stroke='%23F2C45C' stroke-width='2' stroke-linecap='round'/%3E%3Ccircle cx='43' cy='22' r='5' fill='none' stroke='%23F2C45C'/%3E%3C/svg%3E") center/contain no-repeat;z-index:0}
+/* A compact visual brand ribbon at the top of every app surface. */
+/* Visual sigil added to important cards. */
+.sm-v19-card-sigil{position:absolute;right:13px;top:11px;width:30px;height:30px;border-radius:11px;display:grid;place-items:center;color:var(--sm19-gold2);background:linear-gradient(145deg,rgba(242,196,92,.13),rgba(255,244,230,.02));border:1px solid rgba(242,196,92,.22);box-shadow:inset 0 1px rgba(255,255,255,.05)}
+.sm-v19-card-sigil svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.45;stroke-linecap:round;stroke-linejoin:round}
+.card.t-amber,.card.t-drape{position:relative;overflow:hidden}
+.card.t-amber:before,.card.t-drape:before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--sm19-gold2),rgba(214,164,65,.08));border-radius:3px}
+.card.t-amber{background:linear-gradient(145deg,rgba(66,23,29,.96),rgba(53,17,22,.96))!important}
+/* Better button treatment — premium, not toy-like. */
+/* Gold micro-divider and visual anchors. */
+/* Study mode: illustrations become cleaner and quieter. */
+body[data-sm-mode="study"] .card.t-amber{background:linear-gradient(145deg,#FFF8E9,#FFFDFC)}
+@media(max-width:420px){.sm-v19-card-sigil{width:27px;height:27px;right:10px;top:10px}}
+@media(prefers-reduced-motion:reduce){}
+
+/* ================================================================
+   V20 VISUAL RENAISSANCE — presentation layer only
+   Rich visual composition inspired by the approved SurgiMaster hybrid
+   concept. No study engine/state logic is changed.
+================================================================ */
+:root{--v20-maroon:#22080C;--v20-wine:#351116;--v20-wine2:#42171D; --v20 ;--v20-gold2:#F2C45C;--v20 ; --v20-cream:#FAF6EF;--v20 ;--v20-green:#55B98A; --v20-amber:#E9A23B;--v20 ;--v20-blue:#7EA6D8}
+/* Give the existing core cards a more premium silhouette without changing content. */
+.btn.solid{ }
+@media(max-width:520px){}
+@media(prefers-reduced-motion:reduce){}
+
+/* V22 REAL VISUAL ASSETS: actual local illustrations, not just CSS decoration */
+.sm-v22-picture{width:100%;height:auto;display:block;border-radius:20px;margin:0 0 14px;border:1px solid rgba(214,164,65,.28);box-shadow:0 14px 34px rgba(0,0,0,.22)}
+@media(max-width:520px){}
+
+.sm-v25-route{display:grid;grid-template-columns:1.25fr .75fr;gap:12px;margin:12px 0 16px}.sm-v25-route-main,.sm-v25-route-side{position:relative;overflow:hidden;border-radius:22px;border:1px solid rgba(242,196,92,.22);background:linear-gradient(135deg,#351116,#22080C);box-shadow:0 14px 32px rgba(0,0,0,.18)}.sm-v25-route-main{min-height:176px}.sm-v25-route-main:after{content:"";position:absolute;right:-34px;bottom:-44px;width:210px;height:210px;border:2px solid rgba(242,196,92,.18);border-radius:50%;box-shadow:0 0 0 22px rgba(242,196,92,.035),0 0 0 44px rgba(242,196,92,.025)}.sm-v25-route-art{position:absolute;right:4px;bottom:-2px;width:190px;height:145px;opacity:.9}.sm-v25-route-art img{width:100%;height:100%;object-fit:contain}.sm-v25-kicker{font-size:14.5px;letter-spacing:.16em;text-transform:uppercase;font-weight:800}.sm-v25-title{font-weight:900;margin:5px 0}.sm-v25-copy{font-size:17px;line-height:1.5}.sm-v25-route-side{padding:16px;display:flex;flex-direction:column;justify-content:space-between}.sm-v25-symbol{font-size:32.5px}.sm-v25-side-title{font-weight:850;font-size:21px}.sm-v25-side-copy{font-size:16px;line-height:1.45}.sm-v25-phase{display:flex;align-items:center;gap:10px;margin:10px 0 14px}.sm-v25-phase-line{height:2px;flex:1;background:linear-gradient(90deg,#D6A441 0 42%,rgba(214,164,65,.18) 42%)}.sm-v25-phase-dot{width:10px;height:10px;border-radius:50%;background:#F2C45C;box-shadow:0 0 0 5px rgba(242,196,92,.12)}.sm-v25-badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:5px 8px; ;font-size:14.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}.sm-v25-badge:before{content:"";width:6px;height:6px;border-radius:50%;background:#55B98A}@media(max-width:700px){.sm-v25-route{grid-template-columns:1fr}.sm-v25-route-main{min-height:155px}.sm-v25-route-art{width:155px}.sm-v25-copy{max-width:63%}}
+@media(max-width:520px){}
+
+.sm-v26-hero{position:relative;overflow:hidden;min-height:205px;margin:10px 0 16px;border-radius:26px;border:1px solid rgba(242,196,92,.24);background:linear-gradient(135deg,#22080C,#351116 58%,#4A1B22);box-shadow:0 18px 44px rgba(0,0,0,.22);padding:22px}.sm-v26-hero .hero-copy{position:relative;z-index:2;max-width:58%}.sm-v26-hero .hero-art{position:absolute;right:-5px;bottom:-8px;width:49%;height:215px;object-fit:contain;object-position:right bottom;filter:drop-shadow(0 12px 20px rgba(0,0,0,.22))}.sm-v26-kicker{font-size:14.5px;letter-spacing:.18em;text-transform:uppercase;font-weight:850}.sm-v26-title{font-size:32.5px;line-height:1.02;font-weight:950;margin:7px 0 9px;letter-spacing:-.02em}.sm-v26-copy{font-size:17px;line-height:1.55}.sm-v26-pill{display:inline-flex;margin-top:13px;padding:6px 10px;border-radius:999px;border:1px solid rgba(242,196,92,.2);font-size:14.5px;font-weight:850;letter-spacing:.08em;text-transform:uppercase}.sm-v26-section{display:flex;align-items:center;gap:9px;margin:21px 0 9px;font-size:17px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}.sm-v26-section:before{content:"";width:24px;height:2px;border-radius:9px;background:#D6A441}.sm-v26-section .small{font-size:14.5px;font-weight:650;letter-spacing:0;text-transform:none;margin-left:auto}.sm-v26-statbar{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:0 0 17px}.sm-v26-stat{padding:13px 11px;border-radius:17px;background:rgba(53,17,22,.88);border:1px solid rgba(242,196,92,.16);text-align:center}.sm-v26-stat .icon{height:34px;display:grid;place-items:center;margin-bottom:4px}.sm-v26-stat svg{width:31px;height:31px}.sm-v26-stat b{display:block;font-size:17px}.sm-v26-stat span{display:block;font-size:14.5px;line-height:1.35;margin-top:3px}.sm-v26-topic-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:11px}.sm-v26-topic{position:relative;overflow:hidden;min-height:174px;border-radius:20px; ;border:1px solid rgba(74,6,16,.1);box-shadow:0 9px 22px rgba(0,0,0,.08);padding:13px}.sm-v26-topic-art{position:absolute;right:-4px;bottom:-4px;width:118px;height:108px;object-fit:contain;opacity:.7}.sm-v26-topic .topic-top{position:relative;z-index:2;display:flex;align-items:center;gap:7px}.sm-v26-topic .topic-dot{width:8px;height:8px;border-radius:50%;background:#D6A441;box-shadow:0 0 0 5px rgba(214,164,65,.12)}.sm-v26-topic .topic-name{font-size:20px;font-weight:900;max-width:75%}.sm-v26-topic .topic-meta{position:relative;z-index:2;margin-top:8px;font-size:14.5px;max-width:78%;line-height:1.4}.sm-v26-topic .topic-progress{position:relative;z-index:2;margin-top:10px;height:6px;border-radius:99px;overflow:hidden;max-width:74%}.sm-v26-topic .topic-progress i{display:block;height:100%;background:linear-gradient(90deg,#D6A441,#F2C45C);border-radius:99px}.sm-v26-topic .topic-signal{position:relative;z-index:2;margin-top:5px;font-size:14.5px;font-weight:750}.sm-v26-map{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}.sm-v26-map-card{position:relative;overflow:hidden;min-height:108px;border-radius:18px;background:linear-gradient(160deg,#42171D,#2A0B10);border:1px solid rgba(242,196,92,.18);padding:11px}.sm-v26-map-card img{position:absolute;right:-5px;bottom:-5px;width:72px;height:64px;opacity:.42}.sm-v26-map-card .n{font-size:14.5px;font-weight:850;letter-spacing:.1em}.sm-v26-map-card b{display:block;margin-top:5px;font-size:17px;max-width:70%}.sm-v26-map-card span{display:block;margin-top:4px;font-size:14.5px;line-height:1.3;max-width:68%}.sm-v26-progress-head{display:grid;grid-template-columns:1.1fr .9fr;gap:11px;margin:0 0 16px}.sm-v26-progress-card{position:relative;overflow:hidden;border-radius:22px;padding:17px;background:linear-gradient(135deg,#22080C,#42171D);color:#FFF4E6;border:1px solid rgba(242,196,92,.22);min-height:155px}.sm-v26-progress-card img{position:absolute;right:-8px;bottom:-8px;width:53%;height:155px;object-fit:contain;opacity:.88}.sm-v26-progress-card .copy{position:relative;z-index:2;max-width:62%}.sm-v26-progress-side{border-radius:22px;padding:16px;background:#FFFDFC;color:#24181A;border:1px solid rgba(74,6,16,.1);box-shadow:0 9px 22px rgba(0,0,0,.08)}.sm-v26-progress-side .ring{width:58px;height:58px;border-radius:50%;display:grid;place-items:center;border:6px solid #EADBCB;color:#8B6A2B;font-weight:900;font-size:22.5px;margin-bottom:10px}.sm-v26-progress-side b{display:block;font-size:20px}.sm-v26-progress-side span{display:block;margin-top:5px;color:#62565A;font-size:14.5px;line-height:1.4}
+@media(max-width:700px){.sm-v26-hero{min-height:190px;padding:18px}.sm-v26-hero .hero-copy{max-width:64%}.sm-v26-hero .hero-art{width:48%;height:190px}.sm-v26-title{font-size:29.5px}.sm-v26-map{grid-template-columns:repeat(2,1fr)}.sm-v26-progress-head{grid-template-columns:1fr}.sm-v26-progress-card{min-height:175px}.sm-v26-progress-card img{height:170px}.sm-v26-topic-grid{gap:9px}}@media(max-width:430px){.sm-v26-statbar{gap:6px}.sm-v26-stat{padding:10px 6px}.sm-v26-stat span{font-size:14.5px}.sm-v26-topic{min-height:160px;padding:11px}.sm-v26-topic-art{width:95px;height:88px}.sm-v26-hero .hero-copy{max-width:68%}.sm-v26-hero .hero-art{width:45%}}
+
+.sm-simple-intro{margin:10px 0 16px;padding:16px;border-radius:18px;background:linear-gradient(135deg,#351116,#42171D);border:1px solid rgba(242,196,92,.18)}
+.sm-simple-kicker{font-size:16px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#F2C45C}.sm-simple-copy{color:#E8D9CE}.sm-simple-title{font-size:29px;font-weight:900;margin:3px 0 13px;color:#FFF4E6}.sm-simple-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.sm-simple-action{display:flex;align-items:center;gap:8px;text-align:left;padding:10px;border:1px solid rgba(255,244,230,.12);border-radius:13px;background:rgba(0,0,0,.12);color:#FFF4E6}.sm-simple-action b{display:block;font-size:17px}.sm-simple-action small{display:block;color:#D8C8BD;font-size:14.5px;margin-top:2px}.simple-icon{width:27px;height:27px;display:grid;place-items:center;flex:0 0 27px}.simple-icon svg{width:24px;height:24px;fill:none;stroke:#F2C45C;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+@media(max-width:480px){.sm-simple-actions{grid-template-columns:1fr}.sm-simple-action{min-height:48px}}
+
+.sm-skip{position:fixed;left:12px;top:-60px;z-index:9999;padding:10px 14px;border-radius:10px;background:#F2C45C;color:#24181A;font-weight:800;text-decoration:none;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+.sm-skip:focus{top:12px}
+button,a,summary,input,select,textarea{ -webkit-tap-highlight-color:transparent }
+.sm-v26-topic-art,.sm-v26-map-card img,.hero-art{pointer-events:none}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto;animation-duration:.001ms;animation-iteration-count:1;transition-duration:.001ms}}
+@media(max-width:380px){.sm-v26-hero{min-height:176px}.sm-v26-hero .hero-copy{max-width:70%}.sm-v26-title{font-size:27px}.sm-v26-copy{font-size:16px}.sm-v26-pill{font-size:14.5px}.sm-v26-statbar{grid-template-columns:1fr 1fr}.sm-v26-stat:last-child{grid-column:1/-1}.sm-v26-topic{min-height:148px}.sm-v26-topic .topic-name{font-size:18.5px}}
+
+/* Dakshinamurthy 1.1 interaction hardening */
+.sm-action-card,.sm-action-tile{cursor:pointer;appearance:none;-webkit-appearance:none;font:inherit;}
+.sm-action-card:focus-visible,.sm-action-tile:focus-visible{outline:3px solid #F2C45C;outline-offset:3px;}
+.sm-v26-topic.sm-action-card{display:block;width:100%;text-align:left;}
+.sm-v26-map-card.sm-action-card{display:block;width:100%;text-align:left;}
+.sm-v21-tile.sm-action-tile{width:100%;color:inherit;}
+
+/* Offline AI companion */
+.sm-ai-card{border:1px solid rgba(214,164,65,.28)}
+.sm-ai-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}
+.sm-ai-action{appearance:none;border:1px solid rgba(214,164,65,.3);background:var(--card,#351116);color:var(--text,#FFF4E6);border-radius:14px;padding:14px 12px;text-align:left;font-weight:800;cursor:pointer}
+.sm-ai-action:focus-visible{outline:2px solid var(--gold,#D6A441);outline-offset:2px}
+@media(max-width:520px){.sm-ai-grid{grid-template-columns:1fr}}
+
+.sm-ai-handoff{border:1px solid rgba(214,164,65,.25);}
+.sm-ai-status{display:flex;align-items:center;gap:8px;font-size:17px;font-weight:800;margin-top:10px}
+.sm-ai-status .dot{width:9px;height:9px;border-radius:50%;display:inline-block;border:1px solid currentColor;opacity:.55}
+.sm-ai-status .dot.on{opacity:1}
+
+/* V32 clinical touch ergonomics and safe-area hardening. */
+button,.btn,select{min-width:48px;min-height:48px;}
+@media(pointer:coarse){button,.btn,.sm-action-card,.sm-action-tile,.sm-ai-action{min-width:48px;min-height:48px;} }
+nav{padding-bottom:calc(12px + env(safe-area-inset-bottom));}
+button:active,.btn:active,.sm-action-card:active,.sm-action-tile:active,.sm-ai-action:active{transform:scale(.96);transition:transform .08s ease;}
+@media(prefers-reduced-motion:reduce){}
+
+/* ===== v2.6 FINAL VISUAL AUTHORITY =====
+   Historical skin fragments remain for compatibility, but this final layer
+   makes the intended Dakshinamurthy maroon/gold system authoritative. */
+:root{--panel2:#42171D;--line2:#74414A; ; ; }.btn.solid{ }body[data-sm-mode="study"]{background:linear-gradient(180deg,#FAF6EF,#FFFDFC);color:#24181A;}body[data-sm-mode="night"]{background:#0E0507;color:#F2E8DD;}
+/* Keep dense Settings controls usable without making the whole screen enormous. */
+
+/* ===== 2.7 FINAL UI SYSTEM — authoritative, not another historical skin ===== */
+:root{--sm-maroon:#22080C; --sm-card:#351116; --sm-elevated:#42171D; --sm-gold-bright:#F2C45C; --sm-secondary:#D8C8BD; --sm-muted:#9E8D88; --sm-success:#55B98A; --sm-attention:#E9A23B; --sm-error:#D66A6A; --sm-info:#7EA6D8; ; --panel2:var(--sm-elevated); --line2:#74414A; ; ; ; --green:var(--sm-success)}
+html,body{background:var(--sm-maroon);color:var(--sm-ivory)}
+#app{padding:18px 14px calc(100px + env(safe-area-inset-bottom))}
+.card,.blk,.box,.tc .blk{background:var(--sm-card);border-color:#5A2A31!important;box-shadow:0 8px 24px rgba(0,0,0,.18)}
+.sm-v16-brand{margin-bottom:10px}button:not(.navbtn),.btn{border-color:#74414A!important;background:var(--sm-elevated)!important;color:var(--sm-ivory)!important;}
+nav{left:50%;transform:translateX(-50%);bottom:18px;width:min(760px,calc(100% - 28px));border:1px solid #5A2A31;border-radius:18px;background:rgba(34,8,12,.90);backdrop-filter:blur(18px);box-shadow:0 14px 40px rgba(0,0,0,.35);overflow:hidden;padding-bottom:calc(12px + env(safe-area-inset-bottom))}
+.btn.solid{border-color:var(--sm-gold)!important}.chip{background:rgba(214,164,65,.10);border-color:rgba(214,164,65,.28);color:var(--sm-gold-bright);}
+select,textarea,input{background:#22080C;border-color:#74414A;color:var(--sm-ivory)}
+/* Clear hierarchy on Today: mission first, diagnostics later. */
+body[data-sm-page="today"] .sm-v25-route{margin-bottom:10px}
+body[data-sm-page="today"] .sm-v22-picture{display:none}
+body[data-sm-page="today"] .sm-v25-route-art{display:none}
+body[data-sm-page="today"] .sm-v25-route{background:linear-gradient(135deg,#351116,#42171D);min-height:auto}
+body[data-sm-page="today"] .sm-v25-route-side{min-width:0}
+body[data-sm-page="today"] .f1{min-height:52px!important;font-size:22px!important}
+/* Reduce ornamental density in secondary screens. */
+body[data-sm-page="study"] .sm-v26-statbar{margin-bottom:12px}
+body[data-sm-page="progress"] .sm-v26-progress-side{background:#FFFDFC;color:#24181A}
+body[data-sm-page="ai"] .sm-ai-card{box-shadow:none}
+/* Compact controls stay compact; primary actions stay large. */
+.btn.sm,.pick,.segb,.calcell{min-height:44px!important}.sm-ai-action{min-height:48px}
+/* Consistent keyboard focus. */
+button:focus-visible,a:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--sm-gold-bright);outline-offset:3px}
+@media(max-width:520px){
+  .sm-v25-route{border-radius:18px}
+  .sm-v26-section{margin-top:18px}
+}
+@media(prefers-reduced-motion:reduce){button:active,.btn:active,.sm-action-card:active,.sm-action-tile:active,.sm-ai-action:active{transform:none}}
+
+/* 2.8 stability/usability layer */
+html{scroll-behavior:auto}
+button,.btn,select{font:inherit;-webkit-tap-highlight-color:transparent}
+button:disabled,.btn:disabled{cursor:not-allowed;opacity:.55}
+:focus-visible{outline:2px solid var(--sm-gold-bright,#F2C45C);outline-offset:3px}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto;animation-duration:.001ms;transition-duration:.001ms}}
+
+/* 2.9 Reliability layer */
+#saveWarn{position:fixed;left:14px;right:14px;bottom:88px;z-index:1000;padding:10px 12px;border:1px solid rgba(233,162,59,.55);background:#351116;color:#FFF4E6;text-align:center;font-size:.84rem;box-shadow:0 8px 28px rgba(0,0,0,.28)}
+@media (prefers-reduced-motion:reduce){}
+
+/* 3.0 Adaptive Study Engine: calm, high-signal session UI */
+[data-sm-page="today"] .sm-v25-route-art{display:none}
+@media (max-width:520px){.sm-ai-grid{grid-template-columns:1fr 1fr}.f1{min-height:52px}}
+
+/* 3.6 Adaptive Question Selection */
+@media(max-width:560px){}
+
+/* 4.0 Personal Learning Engine */
+
+/* V21 — Clinical Gallery UI: calmer, more image-led, premium medical education look */
+:root{--v21 ; --v21-surface:#FFFFFF; --v21-surface2:#EDF4F3; --v21 ; --v21 ; --v21 ; --v21 ; --v21-teal2:#24A39A; --v21 ; --v21-red:#C65A52; --v21 }
+@media(max-width:390px){}
+
+/* =========================================================
+   V22 — FULL VISUAL ENGINE
+   Presentation-only: clinical editorial + adaptive cockpit.
+   ========================================================= */
+:root{--sv22 ;--sv22 ;--sv22 ;--sv22 ; --sv22 ;--sv22-teal-deep:#073E43;--sv22 ;--sv22 ; --sv22 ;--sv22 ; --sv22 ;--sv22-radius-sm:15px}
+@media(max-width:760px){}
+@media(max-width:480px){}
+@media(prefers-reduced-motion:reduce){}
+
+/* =========================================================
+   V23 — VISUAL INTELLIGENCE ENGINE
+   Image-first clinical learning language; presentation-only.
+   ========================================================= */
+:root{--sv23 ;--sv23 ;--sv23 ;--sv23 ;--sv23 ;--sv23 ;--sv23 ;--sv23-navy:#123844;--sv23}
+@media(max-width:760px){}
+@media(max-width:480px){}
+@media(prefers-reduced-motion:reduce){}
+
+/* =========================================================
+   V24 — TRUE CLINICAL VISUAL CONTENT ENGINE
+   Presentation-only: no study state or adaptive-engine changes.
+   ========================================================= */
+:root{--v24 ;--v24 ;--v24 ;--v24-aqua:#50C9BA;--v24 ;--v24-bg:#F2F7F6;--v24 ;--v24 ;--v24 ;--v24-radius:24px;--v24-shadow:0 16px 42px rgba(7,56,62,.08)}
+@media(max-width:800px){}
+@media(max-width:520px){}
+@media(prefers-reduced-motion:reduce){}
+
+/* ===== V25 TRUE VISUAL CONTENT INTELLIGENCE ===== */
+:root{--v25 ;--v25 ;--v25-mint:#DDF4F0;--v25-paper:#FFFDFC;--v25 ;--v25-muted:#617276;--v25 ;--v25}
+@media(max-width:620px){}
+@media(prefers-reduced-motion:reduce){}
+
+/* ===== V26 Visual Recall Engine ===== */
+:root{--sm-ivory:#fbfaf7;--sm-teal:#0d6f70;--sm-navy:#17324d;--sm-ink:#17232b;--sm-gold:#b58b45;--sm-line:#dce5e4}
+@media(max-width:600px){}
+@media(prefers-reduced-motion:reduce){}
+
+/* V27 — image-forward clinical visual library */
+@media(max-width:760px){}
+@media(max-width:430px){}
+@media(prefers-reduced-motion:reduce){}
+
+/* V28 — premium clinical image treatment. Clean backgrounds are intentional:
+   imagery lives in controlled media frames; text never sits directly on noisy photos. */
+:root{--v28 ;--v28 ;--v28 ;--v28 ;--v28 ;--v28}
+@media(max-width:720px){}
+@media(prefers-reduced-motion:reduce){}
+
+/* V29 — approved Dakshinamurthy identity: final app-icon integration. */
+.sm-v16-brand img{width:46px;height:46px;border-radius:13px;object-fit:cover;border:1px solid rgba(214,164,65,.45)}
+@media(max-width:420px){.sm-v16-brand img{width:42px;height:42px;border-radius:12px}}
+
+/* =========================================================
+   V30 — DAKSHINAMURTHY IDENTITY PALETTE
+   Palette matched to the approved icon: ivory / deep teal /
+   maroon / antique gold. Presentation-only; learning logic unchanged.
+   ========================================================= */
+:root{
+ --ink:#F5EBDD;--panel:#FFFDF8;--panel2:#F2E6D5;--line:#DCC9A8;--line2:#B99455;
+ --drape:#0B625E;--bone:#351116;--amber:#C79632;--rust:#7A1F2B;--violet:#7B5A72;--sky:#557E8A;--muted:#75615E;
+}
+.segb,.pick{color:var(--muted)}.box{color:#FFFDF8}.box.on{background:var(--drape);border-color:var(--drape)}
+.eyebrow,.drape{color:var(--drape)}.rust{color:var(--rust)}
+
+/* V30 visual-engine surfaces */
+
+:root{--v28-teal:#0B625E;--v28-deep:#351116;--v28-ivory:#FBF5EA;--v28-ink:#351116;--v28-gold:#C79632;--v28-line:#DCC9A8}
+
+/* V29/V30 brand ribbon: let the approved icon set the page identity. */.sm-v16-brand img{border-color:#C79632;box-shadow:0 6px 18px rgba(53,17,22,.20),0 0 0 1px rgba(255,248,236,.20)}
+
+/* Maroon is an accent, never the dominant background. */
+@media(prefers-reduced-motion:reduce){}
+
+/* V31 — user-selected Style 3 design system from supplied Dakshinamurthy board */
+:root{
+  --dm-ivory:#F7F1E3; --dm-cream:#FFFDF8; --dm-teal:#005F5A; --dm-teal-deep:#003F3B;
+  --dm-maroon:#74131E; --dm-gold:#C49A43; --dm-gold-soft:#E7D19A; --dm-ink:#1F1717;
+  --dm-line:#DCCBA9;
+}
+body{background:var(--dm-ivory);color:var(--dm-ink)}
+.btn.solid,.btn.f1{background:linear-gradient(180deg,#006E68,#004F4B)!important;border-color:var(--dm-gold)!important;color:#FFF9EA!important}
+.btn:not(.solid){background:var(--dm-cream)!important;border-color:var(--dm-gold-soft)!important;color:var(--dm-maroon)!important}
+.card{border-color:var(--dm-line)!important}
+
+/* ===== V32 Visual Engine Upgrade: quality-first clinical media ===== */
+@media(max-width:760px){}
+@media(max-width:430px){}
+@media(prefers-reduced-motion:reduce){}
+
+/* ===== V33 — Topic-aware Clinical Visual Atlas ===== */@media(max-width:760px){}@media(max-width:430px){}@media(prefers-reduced-motion:reduce){}
+
+/* ===== V33.1 UI refinement — UI only, no anatomy/clinical media ===== */
+body.dm-ui33{--ui-ivory:#F7F1E3;--ui-card:#FFFDF8;--ui-teal:#005F5A;--ui-teal-deep:#003F3B; --ui-maroon:#74131E;--ui-gold:#C49A43;--ui-line:#DCCBA9; background:linear-gradient(180deg,#F7F1E3 0%,#F3EBDD 100%); color:#1F1717}
+body.dm-ui33 .card{
+  border:1px solid var(--ui-line)!important;background:rgba(255,253,248,.96)!important;
+  border-radius:18px!important;box-shadow:0 8px 24px rgba(53,17,22,.055)!important;
+  padding:16px!important;margin-bottom:12px!important;
+}
+body.dm-ui33 .hd{padding:7px 2px 10px;align-items:center}
+body.dm-ui33 .h1{font-size:29px;letter-spacing:-.02em;color:var(--ui-maroon)}
+body.dm-ui33 .h2{color:#351116;font-size:24px}
+body.dm-ui33 .eyebrow{color:var(--ui-teal);font-weight:850;letter-spacing:1.45px}
+body.dm-ui33 .sm-v16-brand{
+  position:relative;margin:4px 0 14px;padding:12px 14px;border:1px solid var(--ui-line);
+  border-radius:18px;background:linear-gradient(135deg,#FFFDF8,#F4EBDD);
+  box-shadow:0 10px 28px rgba(53,17,22,.07);
+}
+body.dm-ui33 .sm-v16-brand-name{color:var(--ui-maroon)!important;font-weight:800!important;letter-spacing:-.02em}
+body.dm-ui33 .sm-v16-brand-sub{color:var(--ui-teal)!important}
+body.dm-ui33 .sm-v16-brand-mode{border-color:var(--ui-gold)!important;color:var(--ui-maroon)!important;background:#FFFDF8!important;border-radius:999px!important}
+body.dm-ui33 .btn,body.dm-ui33 button:not(.navbtn){
+  border-radius:12px!important;transition:transform .14s ease,box-shadow .14s ease,background .14s ease;
+}
+body.dm-ui33 .btn.solid{
+  background:linear-gradient(135deg,#006E68,#00514D)!important;color:#FFF9EA!important;
+  border:1px solid var(--ui-gold)!important;box-shadow:0 7px 16px rgba(0,95,90,.16)!important;
+}
+body.dm-ui33 .btn:not(.solid):not(.primary):not(.main):not(.go){background:#FFFDF8!important;color:var(--ui-maroon)!important;border-color:var(--ui-line)!important}
+body.dm-ui33 .btn:hover,body.dm-ui33 button:not(.navbtn):hover{transform:translateY(-1px);box-shadow:0 7px 16px rgba(53,17,22,.08)}
+body.dm-ui33 .btnrow{gap:8px}
+body.dm-ui33 .track{background:#E9E0D1!important;height:7px!important}
+body.dm-ui33 .fill{background:var(--ui-teal)!important}
+body.dm-ui33 .strip2,body.dm-ui33 .g2,body.dm-ui33 .g3{gap:9px}
+body.dm-ui33 .chip,body.dm-ui33 .pick,body.dm-ui33 .segb,body.dm-ui33 .cd{border-color:var(--ui-line)!important;background:#FFFDF8!important}
+body.dm-ui33 .chip{min-height:48px;border-radius:13px!important}
+body.dm-ui33 .pick.on,body.dm-ui33 .segb.on{background:var(--ui-maroon)!important;border-color:var(--ui-gold)!important;color:#FFF!important}
+body.dm-ui33 select,body.dm-ui33 textarea,body.dm-ui33 input[type=date]{background:#FFFDF8!important;color:#351116!important;border-color:var(--ui-line)!important}
+body.dm-ui33 .dayhd{border-color:var(--ui-line)!important;background:#FFFDF8!important;border-radius:18px!important;box-shadow:0 8px 24px rgba(53,17,22,.05)}
+body.dm-ui33 .blk{border-color:var(--ui-line)!important;background:#FFFDF8!important;border-radius:14px!important}
+body.dm-ui33 .sm-v25-route{border-radius:22px!important;box-shadow:0 14px 35px rgba(53,17,22,.09)!important}
+body.dm-ui33 .sm-v25-route-main{padding:20px!important}
+body.dm-ui33 .sm-v25-title{font-size:31px!important;letter-spacing:-.03em!important}
+body.dm-ui33 .sm-v25-copy{max-width:48ch!important}
+body.dm-ui33 details>summary{color:var(--ui-maroon)!important;font-weight:700}
+body.dm-ui33 button:focus-visible,body.dm-ui33 a:focus-visible,body.dm-ui33 select:focus-visible,body.dm-ui33 textarea:focus-visible{outline:3px solid var(--ui-gold)!important;outline-offset:3px}
+@media(max-width:520px){
+  body.dm-ui33{padding-left:11px;padding-right:11px}
+  body.dm-ui33 .sm-v16-brand{padding:11px 12px;border-radius:16px}
+  body.dm-ui33 .sm-v16-brand-name{font-size:25px!important}
+  body.dm-ui33 .h1{font-size:27px}
+  body.dm-ui33 .card{padding:14px!important;border-radius:16px!important}
+  body.dm-ui33 .sm-v25-title{font-size:28px!important}
+}
+@media(prefers-reduced-motion:reduce){body.dm-ui33 .btn,body.dm-ui33 button:not(.navbtn){transition:none}}
+
+/* ===== V33.2 UI polish — hierarchy, touch ergonomics, calm density ===== */
+body.dm-ui33{--ui-radius:18px;--ui-shadow:0 10px 28px rgba(53,17,22,.055);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+body.dm-ui33 #app{margin:0 auto;padding-top:4px}
+body.dm-ui33 .card{transition:box-shadow .18s ease,transform .18s ease,border-color .18s ease}
+body.dm-ui33 .card:has(.btn):hover{box-shadow:0 13px 32px rgba(53,17,22,.075)!important}
+body.dm-ui33 .hd{border-bottom:1px solid rgba(220,203,169,.55);margin-bottom:12px!important}
+body.dm-ui33 .h1{font-weight:850!important;line-height:1.1!important}
+body.dm-ui33 .h2{font-weight:800!important;line-height:1.2!important}
+body.dm-ui33 .btn{min-height:44px!important;font-weight:800!important;letter-spacing:.01em}
+body.dm-ui33 .btnrow>.btn{flex:0 1 auto}
+body.dm-ui33 .chip,body.dm-ui33 .pick,body.dm-ui33 .segb{transition:background .15s ease,border-color .15s ease,transform .15s ease}
+body.dm-ui33 .chip:hover,body.dm-ui33 .pick:hover,body.dm-ui33 .segb:hover{transform:translateY(-1px);border-color:var(--ui-gold)!important}
+body.dm-ui33 .track{border-radius:999px!important;overflow:hidden}
+body.dm-ui33 .fill{border-radius:999px!important}
+body.dm-ui33 #saveWarn{border-radius:12px!important}
+body.dm-ui33 :is(input,select,textarea,button){font:inherit}
+body.dm-ui33 :is(input,select,textarea):focus{box-shadow:0 0 0 3px rgba(196,154,67,.16)!important}
+body.dm-ui33 .blk{transition:border-color .16s ease,box-shadow .16s ease}
+@media(min-width:760px){}
+@media(max-width:520px){body.dm-ui33 #app{padding-left:2px;padding-right:2px}.dm-ui33 #app{padding-bottom:92px!important}.dm-ui33 .btnrow{flex-wrap:wrap}.dm-ui33 .btnrow>.btn{min-width:120px}}
+@media(prefers-reduced-motion:reduce){body.dm-ui33 .card,body.dm-ui33 .chip,body.dm-ui33 .pick,body.dm-ui33 .segb{transition:none}}
+
+/* ===== V33.4 stability + iOS polish ===== */
+body.dm-ui33{scroll-padding-bottom:110px}
+@supports (height: 100dvh){body.dm-ui33{min-height:100dvh}}
+@media(max-width:520px){
+  body.dm-ui33 .btn{touch-action:manipulation}
+}
+
+/* ===== V33.6 UI hardening — no content/engine changes ===== */
+html.dm-ui33-root{background:#F7F1E3}
+body.dm-ui33{overflow-x:hidden}
+body.dm-ui33 :is(button,.btn,.chip,.pick,.segb){-webkit-tap-highlight-color:transparent}
+body.dm-ui33 :is(button,.btn,.chip,.pick,.segb):disabled{cursor:not-allowed;opacity:.55;transform:none!important;box-shadow:none!important}
+body.dm-ui33 :is(button,.btn,.chip,.pick,.segb){touch-action:manipulation}
+body.dm-ui33 .card,body.dm-ui33 .blk,body.dm-ui33 .dayhd{overflow-wrap:anywhere}body.dm-ui33 .sm-v25-copy{max-width:72ch}
+@media(max-width:520px){
+  body.dm-ui33 .card:has(.btn):active{transform:none}
+}
+@media(prefers-reduced-motion:reduce){
+  body.dm-ui33 *{scroll-behavior:auto!important;animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+}
+/* V34 Adaptive Intelligence 2.0 */
+@media(max-width:640px){}
+@media(prefers-reduced-motion:reduce){}
+
+/* =====================================================================
+   V35 — FINAL RESOLUTION LAYER
+   =====================================================================
+   Read this before adding a V36.
+
+   surgimaster.css had grown to 34 stacked "visual version" layers, each
+   one overriding the last with !important. That is how the two worst bugs
+   in this file happened, and both were invisible to every previous review
+   because nobody had ever measured the rendered page in a real browser:
+
+   1. NAV OFF-SCREEN. The base rule (`nav{left:50%;transform:translateX(-50%)}`)
+      was written for `position:fixed`, where that pair is correct centering.
+      V33.2 then changed the nav to `position:sticky` with `margin:auto` —
+      which centres it on its own — but never removed the transform. The two
+      centring methods stacked, sliding the whole bar half its own width to
+      the left: at 390px the Today and Learn buttons sat at x = -145 and -78.
+      The two most important tabs in the app were literally unreachable.
+      The V33.6 mobile rule that would have fixed it (`@media(max-width:520px)
+      .sm-v17-nav{position:fixed;left:11px;right:11px}`) never applied, because
+      `body.dm-ui33 .sm-v17-nav` outranks a bare `.sm-v17-nav` on specificity
+      no matter which media query it sits in.
+      LESSON: media queries do not raise specificity. A mobile override of a
+      body-scoped rule must itself be body-scoped.
+
+   2. INVISIBLE TEXT. The v25/v26 hero components keep dark maroon surfaces,
+      but the later dm-ui33 light-parchment layer set generic element colours
+      (b, div, .small) to near-black without excluding those dark surfaces.
+      Result: "Climb, don't chase." rendered at 1.02:1 — dark ink on dark
+      maroon. Present in the shipped build, on the home screen, in the
+      headline.
+      LESSON: a theme layer that changes the page surface must state the text
+      colour for every component that keeps its own surface.
+
+   This layer is scoped, ordered and commented. Prefer fixing a cause here
+   over adding another layer on top of it.
+   ===================================================================== */
+
+/* ---------- 1. Navigation geometry (single source of truth) ---------- */
+/* One positioning model at every width: fixed, centred by the left/transform
+   pair, safe-area aware. No sticky, no auto margins, no competing centring. */
+/* The bar is fixed, so it no longer occupies flow space: #app must reserve
+   its height itself or the last card sits underneath the nav. */
+body.dm-ui33 #app{padding-bottom:calc(112px + env(safe-area-inset-bottom))!important}
+@media(max-width:520px){
+  body.dm-ui33{padding-bottom:0!important}
+}
+/* Every tab is a primary destination; `secondary` must not shrink More below
+   the 44px touch minimum or misalign the 5-up grid. */
+
+/* ---------- 2. Text that must stay readable on dark component surfaces ---------- */
+/* These components keep a dark maroon/teal surface in every visual mode, so
+   their text is pinned light here regardless of what the page theme does. */
+body.dm-ui33 .sm-v25-route-main,body.dm-ui33 .sm-v25-route-side,
+body.dm-ui33 .sm-v26-hero,body.dm-ui33 .sm-v26-stat,body.dm-ui33 .sm-v26-map-card{color:#FFF4E6!important}
+body.dm-ui33 .sm-v25-title,body.dm-ui33 .sm-v25-side-title,
+body.dm-ui33 .sm-v26-title,body.dm-ui33 .sm-v26-stat b,
+body.dm-ui33 .sm-v26-map-card b{color:#FFF8EC!important}
+body.dm-ui33 .sm-v25-copy,body.dm-ui33 .sm-v25-side-copy,body.dm-ui33 .sm-v26-copy,
+body.dm-ui33 .sm-v26-stat span,body.dm-ui33 .sm-v26-map-card span{color:#E7D9CC!important}
+/* Gold-on-dark accents: lifted to a brighter gold so the 4.5:1 floor is met
+   at the 9-10px sizes these are actually used at. */
+body.dm-ui33 .sm-v25-kicker,body.dm-ui33 .sm-v26-kicker,
+body.dm-ui33 .sm-v25-badge,body.dm-ui33 .sm-v26-pill,
+body.dm-ui33 .sm-v25-symbol,body.dm-ui33 .sm-v26-map-card .n{color:#F7D28A!important}
+/* .sm-v26-section is a heading ON the light page, not on a hero. */
+body.dm-ui33 .sm-v26-section{color:#8A6410!important}
+body.dm-ui33 .sm-v26-section .small{color:#5E5250!important}
+body.dm-ui33 .sm-v25-badge,body.dm-ui33 .sm-v26-pill{
+  background:rgba(247,210,138,.14)!important;border-color:rgba(247,210,138,.34)!important}
+
+/* ---------- 3. Surface normalisation + contrast floor ---------- */
+/* First attempt at this section darkened every muted token on the assumption
+   that dm-ui33 is a light theme. Measuring the COMPOSITED background of each
+   failing element proved that wrong and made several worse: the v14 journey
+   card and the calendar grid are dark-maroon leftovers from the pre-dm-ui33
+   era, still sitting inside a light page. `.muted` even resolves onto a light
+   surface on Today and a dark one on Learn.
+   So the fix is to normalise the surface first, then set ink against a
+   surface that is now known, rather than guess ink per class. This also
+   removes the last two islands of the old maroon theme from a parchment UI,
+   which is a coherence win as much as a contrast one. */
+
+/* 3a. Journey / progress card -> light surface */
+body.dm-ui33 .sm-v14-progress{
+  background:#FFFCF6!important;border:1px solid var(--ui-line)!important;color:#241A18!important;
+  box-shadow:0 8px 24px rgba(53,17,22,.06)!important}
+body.dm-ui33 .sm-v14-pct,body.dm-ui33 .sm-v14-next strong,
+body.dm-ui33 .sm-v14-stat b,body.dm-ui33 .sm-v14-mini b{color:#241A18!important}
+body.dm-ui33 .sm-v14-eyebrow,body.dm-ui33 .sm-v14-scale,body.dm-ui33 .sm-v14-scale span,
+body.dm-ui33 .sm-v14-legend,body.dm-ui33 .sm-v14-dotlabel,
+body.dm-ui33 .sm-v14-stat span,body.dm-ui33 .sm-v14-mini span,
+body.dm-ui33 .sm-v14-next small{color:#5A4B48!important}
+body.dm-ui33 .sm-v14-pct span{color:#8A6410!important}
+body.dm-ui33 .sm-v14-status{color:#0A4F4C!important;border-color:rgba(10,79,76,.45)!important;background:rgba(10,79,76,.07)!important}
+body.dm-ui33 .sm-v14-track{background:#EBE2D4!important;border-color:#D8CBBA!important}
+body.dm-ui33 .sm-v14-next,body.dm-ui33 .sm-v14-stat,body.dm-ui33 .sm-v14-mini{
+  background:#FBF6EC!important;border-color:#E2D6C6!important}
+body.dm-ui33 .sm-v14-marker{background:#6B564F!important;box-shadow:none!important}
+body.dm-ui33 .sm-v14-you{border-color:#FFFCF6!important}
+body.dm-ui33 .sm-v14-chip{background:#8A6410!important;color:#FFF8EC!important}
+body.dm-ui33 .sm-v14-details summary{color:#5A4B48!important}
+
+/* 3b. Calendar grid -> light cells */
+body.dm-ui33 .calcell,body.dm-ui33 .caldow{
+  background:#FFFCF6!important;border-color:#E2D6C6!important}
+body.dm-ui33 .caln{color:#2E211F!important}
+body.dm-ui33 .callbl,body.dm-ui33 .caldow{color:#5E5250!important}
+body.dm-ui33 .caldot{background:#8A6410!important}
+
+/* 3c. Ink on the light page surface (measured; these all failed AA before) */
+body.dm-ui33{--ui-muted:#5E5250}
+body.dm-ui33 .muted,body.dm-ui33 p.muted,body.dm-ui33 .msc-sub{color:#5E5250!important}
+body.dm-ui33 .msc-pct{color:#0A5A56!important}
+body.dm-ui33 .jumplink{color:#0A5A56!important}
+body.dm-ui33 .sm-v10-good{color:#08553E!important}
+/* `.small` and `.muted` also appear inside the dark hero components, where
+   section 2 already pins them light; those rules are later in the file and
+   more specific, so they win there and only there. */
+
+/* 3d. Chips / picks / segmented buttons — the worst contrast defect found.
+   dm-ui33 gave these a near-white surface (#FFFDF8) but never set their ink,
+   so they inherited `--sm-ivory` from the old dark theme's
+   `button:not(.navbtn){color:var(--sm-ivory)!important}`. Result: 1.03:1,
+   ivory on ivory. These are the Right / Fragile / Wrong and
+   Fluent / Hesitant / Froze self-rating buttons — the single interaction the
+   whole SM-2 loop depends on — and they were rendering as blank rectangles.
+   Verified present in the shipped V34 build, not introduced here. */
+body.dm-ui33 :is(.chip,.pick,.segb,.cd){color:#2E211F!important}
+body.dm-ui33 :is(.chip,.pick,.segb,.cd) :is(b,strong,span,small,div){color:inherit!important}
+body.dm-ui33 :is(.chip,.pick,.segb,.cd) .muted{color:#5E5250!important}
+/* Selected state keeps the maroon fill from dm-ui33, so its ink must flip. */
+body.dm-ui33 :is(.pick,.segb).on,body.dm-ui33 :is(.pick,.segb).on *{color:#FFF8EC!important}
+
+/* 3e. Action tiles keep a dark maroon surface on the Learn tab, so the
+   generic `.muted` ink from 3c would land dark-on-dark inside them. */
+body.dm-ui33 .sm-v21-tile,body.dm-ui33 .sm-action-tile{color:#FFF4E6!important}
+body.dm-ui33 :is(.sm-v21-tile,.sm-action-tile) :is(.muted,.sm,.small,span,div){color:#E2D2C6!important}
+body.dm-ui33 :is(.sm-v21-tile,.sm-action-tile) :is(b,strong){color:#FFF8EC!important}
+
+/* 3f. Small-type tokens that were still marginally under 4.5:1 when measured
+   at their real rendered size (9.5-12.5px), not at an assumed 16px. */
+body.dm-ui33 .msc-sub{color:#4F4442!important}
+body.dm-ui33 p.muted.sm{color:#4F4442!important}
+
+/* ---------- 4. Touch targets ---------- */
+/* Every disclosure row in the app rendered 16-20px tall — roughly a third of
+   the 44px minimum, on the primary way of opening content on four of the five
+   tabs. Padding rather than min-height, so the whole row stays tappable. */
+body.dm-ui33 details>summary{
+  min-height:44px!important;display:flex;align-items:center;gap:8px;
+  padding:11px 12px!important;margin:0 -12px!important;border-radius:12px;cursor:pointer}
+body.dm-ui33 details>summary:hover{background:rgba(53,17,22,.045)}
+body.dm-ui33 details[open]>summary{margin-bottom:2px!important}
+body.dm-ui33 .jumplink{display:inline-flex;align-items:center;min-height:44px;padding:0 4px}
+
+/* ---------- 5. Horizontal overflow ---------- */
+/* The 7-column calendar used fixed cell widths and spilled past the right
+   edge below ~390px, taking the whole page into horizontal scroll with it. */body.dm-ui33 .calgrid{
+  display:grid!important;grid-template-columns:repeat(7,minmax(0,1fr))!important;
+  gap:4px!important;width:100%!important;max-width:100%!important}
+body.dm-ui33 .calcell,body.dm-ui33 .caldow{min-width:0!important;max-width:100%!important;overflow:hidden}
+body.dm-ui33 .callbl{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+body.dm-ui33 #app,body.dm-ui33 .card,body.dm-ui33 .blk{max-width:100%;min-width:0}
+
+/* ---------- 6. Brand chip ---------- */
+/* "FOCUS MODE" overflowed its own card and was clipped mid-word at 390px. */
+body.dm-ui33 .sm-v16-brand{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+body.dm-ui33 .sm-v16-brand-mode{
+  flex:0 0 auto;white-space:nowrap;font-size:14.5px!important;padding:7px 10px!important;
+  min-height:44px;display:inline-flex;align-items:center}
+body.dm-ui33 .sm-v16-brand>div{min-width:0}
+
+/* ---------- 7. Focus visibility ---------- */
+/* Keyboard focus was invisible on the parchment surface. */
+body.dm-ui33 :is(button,a,summary,select,input,textarea,.btn,.chip,.pick,.segb):focus-visible{
+  outline:3px solid #0A5A56!important;outline-offset:2px!important;border-radius:10px}
+
+/* ---------- 8. Night mode ---------- */
+/* Night was dead: the attribute changed, dm-ui33's !important rules kept the
+   parchment surface, and the app stayed bright at 1am. Restored at a
+   specificity that actually wins (body.dm-ui33[data-sm-mode="night"]). */
+html.dm-ui33-root:has(body[data-sm-mode="night"]){background:#140A0C}
+body.dm-ui33[data-sm-mode="night"]{
+  background:linear-gradient(180deg,#190C0F,#120709)!important;color:#EFE2D6!important}
+body.dm-ui33[data-sm-mode="night"] :is(.card,.blk,.panel,.box,.dayhd,.chip,.pick,.segb,.cd){
+  background:#241316!important;border-color:#4A2B30!important;color:#EFE2D6!important;
+  box-shadow:0 8px 22px rgba(0,0,0,.34)!important}
+body.dm-ui33[data-sm-mode="night"] :is(.h1,.h2,.lbl,b,strong){color:#FFF3E4!important}
+body.dm-ui33[data-sm-mode="night"] :is(.muted,.sm,p.muted,.sm-v14-eyebrow,.caln,.callbl,
+  .sm-v14-dotlabel,.sm-v14-scale,.sm-v14-legend){color:#BCA79C!important}
+body.dm-ui33[data-sm-mode="night"] :is(select,textarea,input){
+  background:#241316!important;color:#EFE2D6!important;border-color:#4A2B30!important}
+body.dm-ui33[data-sm-mode="night"] .btn:not(.solid):not(.primary):not(.main):not(.go){
+  background:#2C181C!important;color:#F4E4D6!important;border-color:#553137!important}
+body.dm-ui33[data-sm-mode="night"] .track{background:#33191E!important}
+body.dm-ui33[data-sm-mode="night"] details>summary{color:#F3D9A6!important}
+body.dm-ui33[data-sm-mode="night"] details>summary:hover{background:rgba(255,243,228,.07)}
+body.dm-ui33[data-sm-mode="night"] .jumplink{color:#7FD4C8!important}
+body.dm-ui33[data-sm-mode="night"] .sm-v10-good{color:#63D3A2!important}
+body.dm-ui33[data-sm-mode="night"] .sm-v14-status{border-color:rgba(127,212,200,.45)!important}
+
+/* ---------- 9. Study mode ---------- */
+/* Study is the long-reading surface: warmer paper, larger body text, a longer
+   measure. It was almost indistinguishable from Focus before. */
+body.dm-ui33[data-sm-mode="study"]{background:linear-gradient(180deg,#FBF6EC,#F6EFE2)!important}
+body.dm-ui33[data-sm-mode="study"] :is(.card,.blk,.dayhd){background:#FFFCF6!important}
+body.dm-ui33[data-sm-mode="study"] :is(.stem,.ans,p,.sm-v25-copy){font-size:21px!important;line-height:1.72!important}
+body.dm-ui33[data-sm-mode="study"] :is(.stem,.ans){max-width:68ch!important;color:#241A18!important}
+
+/* ---------- 10. Reduced motion ---------- */
+@media(prefers-reduced-motion:reduce){
+  body.dm-ui33 details>summary,body.dm-ui33 nav.sm-v17-nav{transition:none!important}
+}
+
+/* ---------- 11. Remaining measured contrast gaps ---------- */
+/* 11a. Light modes: three tokens still under 4.5:1 at their rendered size. */
+body.dm-ui33 .tick{color:#4F4442!important}
+body.dm-ui33 .btop{color:#0A5A56!important}
+body.dm-ui33 .amber,body.dm-ui33 p.sm.amber{color:#7A4705!important}
+
+/* 11b. Night mode ink.
+   Section 3 normalises the v14 card, the calendar and the muted tokens onto a
+   LIGHT surface — correct for Focus and Study, wrong for Night, where section
+   8 has just made those same surfaces dark. Night is scoped one level deeper
+   (`body.dm-ui33[data-sm-mode="night"]`) so it outranks section 3 and only
+   there. Without this, fixing the light modes silently broke the dark one —
+   which is exactly how the original dark-on-dark defects got in. */
+body.dm-ui33[data-sm-mode="night"] .sm-v14-progress{
+  background:#241316!important;border-color:#4A2B30!important;color:#EFE2D6!important}
+body.dm-ui33[data-sm-mode="night"] :is(.sm-v14-next,.sm-v14-stat,.sm-v14-mini){
+  background:#2C181C!important;border-color:#553137!important}
+body.dm-ui33[data-sm-mode="night"] :is(.sm-v14-pct,.sm-v14-next strong,.sm-v14-stat b,.sm-v14-mini b){color:#FFF3E4!important}
+body.dm-ui33[data-sm-mode="night"] :is(.sm-v14-eyebrow,.sm-v14-scale,.sm-v14-scale span,
+  .sm-v14-legend,.sm-v14-dotlabel,.sm-v14-stat span,.sm-v14-mini span,.sm-v14-next small,
+  .sm-v14-details summary){color:#C4B0A5!important}
+body.dm-ui33[data-sm-mode="night"] .sm-v14-track{background:#33191E!important;border-color:#553137!important}
+body.dm-ui33[data-sm-mode="night"] .sm-v14-you{border-color:#241316!important}
+body.dm-ui33[data-sm-mode="night"] .sm-v14-status{color:#7FD4C8!important;background:rgba(127,212,200,.10)!important}
+body.dm-ui33[data-sm-mode="night"] :is(.calcell,.caldow,.calg,.calrow){
+  background:#241316!important;border-color:#4A2B30!important}
+body.dm-ui33[data-sm-mode="night"] .caln{color:#F2E4D8!important}
+body.dm-ui33[data-sm-mode="night"] :is(.callbl,.caldow){color:#BCA79C!important}
+body.dm-ui33[data-sm-mode="night"] :is(.eyebrow,.eyebrow.amber,.eyebrow.drape,.eyebrow.rust,.eyebrow.sky){color:#E7C688!important}
+body.dm-ui33[data-sm-mode="night"] .small{color:#BCA79C!important}
+body.dm-ui33[data-sm-mode="night"] .btop{color:#7FD4C8!important}
+body.dm-ui33[data-sm-mode="night"] :is(.amber,p.sm.amber){color:#F0B45C!important}
+body.dm-ui33[data-sm-mode="night"] :is(.chip,.pick,.segb,.cd){
+  background:#2C181C!important;border-color:#553137!important;color:#F2E4D8!important}
+body.dm-ui33[data-sm-mode="night"] :is(.chip,.pick,.segb,.cd) *{color:inherit!important}
+body.dm-ui33[data-sm-mode="night"] :is(.sm-state-title,.sm-state-note){color:#EFE2D6!important}
+body.dm-ui33[data-sm-mode="night"] :is(.sm-state,.sm-state-card,.sm-emotional){
+  background:#241316!important;border-color:#4A2B30!important}
+body.dm-ui33[data-sm-mode="night"] .msc-sub{color:#BCA79C!important}
+body.dm-ui33[data-sm-mode="night"] .msc-pct{color:#7FD4C8!important}
+
+/* 11c. Night: bands and tokens that kept a light surface or light-mode ink.
+   Found by measuring the composited background of each remaining failure
+   rather than by pattern-matching class names. */
+body.dm-ui33[data-sm-mode="night"] :is(.jumprow,.ans,.sm-v16-reading-note,.strip,.strip2){
+  background:#2C181C!important;border-color:#553137!important;color:#EFE2D6!important}
+body.dm-ui33[data-sm-mode="night"] :is(.jumprow,.ans,.sm-v16-reading-note) :is(b,strong,span,div){color:#EFE2D6!important}
+body.dm-ui33[data-sm-mode="night"] .pillq{
+  background:#3A2126!important;border-color:#553137!important;color:#F2E4D8!important}
+body.dm-ui33[data-sm-mode="night"] :is(.sm-v10-s,.sm-v10-k,.msc-lbl){color:#C4B0A5!important}
+body.dm-ui33[data-sm-mode="night"] :is(.sm-v10-card,.sm-v10-grid){color:#EFE2D6!important}
+
+/* 11d. Night: redefine the base tokens, not the classes that use them.
+   The last failures were unclassed <span>s and .tt/.tick in the day timeline,
+   all resolving `var(--muted)` = #75615E — a value chosen for the light
+   parchment surface (line 1063) and far too dark once the surface is dark.
+   Overriding the token fixes every consumer at once, including the ones with
+   no class to target, and stops the next timeline element from regressing. */
+/* Text tokens ONLY. A first attempt also overrode --panel/--line2/--drape;
+   those tokens are used as BACKGROUNDS elsewhere, so redefining them flipped
+   several surfaces light and created seven new failures where there had been
+   none. Contrast went 10 -> 17. Keep this rule to ink. */
+body.dm-ui33[data-sm-mode="night"]{--muted:#BCA79C}
+body.dm-ui33[data-sm-mode="night"] :is(.tt,.tick,.sub,.meta){color:#BCA79C!important}
+/* .tick carries its own light pill background; darken the pill, keep light ink. */
+body.dm-ui33[data-sm-mode="night"] .tick{
+  background:#2C181C!important;border-color:#553137!important;color:#C4B0A5!important}
+body.dm-ui33[data-sm-mode="night"] :is(.btn.solid,.btn.primary,.btn.main,.btn.go),
+body.dm-ui33[data-sm-mode="night"] :is(.btn.solid,.btn.primary,.btn.main,.btn.go) *{color:#FFF9EA!important}
+
+/* 11e. .sm-v26-progress-side is a deliberately white "paper" card paired with
+   the dark progress hero. In Night it stayed white while section 8's
+   `b,strong -> #FFF3E4` rule lit its text, giving white-on-white. Darken the
+   card rather than exempt the text, so Night has no bright panels left. */
+body.dm-ui33[data-sm-mode="night"] .sm-v26-progress-side{
+  background:#241316!important;border-color:#4A2B30!important;color:#EFE2D6!important}
+body.dm-ui33[data-sm-mode="night"] .sm-v26-progress-side span{color:#BCA79C!important}
+body.dm-ui33[data-sm-mode="night"] .sm-v26-progress-side .ring{border-color:#4A2B30!important;color:#F3D9A6!important}
+
+/* 11f. The brand card kept its cream gradient in Night. Contrast passed
+   (dark ink on light card), so the automated check was silent — but a white
+   slab is the whole thing Night exists to avoid. A passing contrast test is
+   not the same as a dark theme; look at the screenshot too. */
+body.dm-ui33[data-sm-mode="night"] .sm-v16-brand{
+  background:linear-gradient(135deg,#2C181C,#241316)!important;border-color:#4A2B30!important}
+body.dm-ui33[data-sm-mode="night"] .sm-v16-brand-name{color:#F3D9A6!important}
+body.dm-ui33[data-sm-mode="night"] .sm-v16-brand-sub{color:#9FC2E8!important}
+body.dm-ui33[data-sm-mode="night"] .sm-v16-brand-mode{
+  background:#2C181C!important;color:#F3D9A6!important;border-color:#8A6410!important}
+
+/* ---------- 12. Type scale (V35.2) ---------- */
+/* Every hardcoded font-size in the app has been raised twice now. The app
+   shipped with sizes down to 7px, and 10px was the single most common size in
+   this stylesheet — on a phone, at arm's length, that is not readable text.
+   Both passes use the same compressive shape: small text gains the most,
+   headings the least, and the curve is monotonic so relative hierarchy is
+   preserved everywhere. Net effect from the original V34 sizes:
+   7-10px -> 14px, 12 -> 17px, 14 (body) -> 20px, 20 -> 25.5px, 25 -> 29px.
+
+   At this size the constraint stops being comfort and becomes column width,
+   so two components need a layout answer rather than a type answer. */
+
+/* 12a. Calendar. A 7-column grid gives each cell ~45px on a 375px phone.
+   A topic label cannot fit there at a readable size, and shrinking it back to
+   9px would reintroduce exactly the problem this scale exists to fix. So on
+   phones the per-cell label is dropped and the day numeral gets the space
+   instead; the label returns at >=560px where the cells are wide enough to
+   hold it. The information is not lost — the day's topics are listed in full
+   in "Calendar & time split" directly below the grid. */
+@media(max-width:559px){
+  body.dm-ui33 .callbl{display:none!important}
+  body.dm-ui33 .caln{font-size:17px!important;font-weight:800!important}
+  body.dm-ui33 .calcell{min-height:44px!important;display:flex!important;
+    align-items:center!important;justify-content:center!important;padding:4px!important}
+}
+@media(min-width:560px){
+  body.dm-ui33 .callbl{font-size:12px!important;letter-spacing:0!important}
+  body.dm-ui33 .caln{font-size:17px!important}
+}
+
+/* 12b. Navigation labels. Five columns share the bar width, and "Progress" is
+   the longest label. At the global scale it wraps to two lines and changes the
+   bar's height, so it is pinned just under the scale and allowed to shrink one
+   more step on the narrowest phones. Still larger than the 10px it shipped at. */
+@media(max-width:389px){}
+
+/* 12c. Hold the measure. Larger type on a fixed-width card means more
+   characters per line unless the measure is capped; ~64ch keeps long MCQ
+   stems and explanations easy to track back to the next line. */
+body.dm-ui33 :is(.stem,.ans,.sm-v25-copy,.sm-v26-copy,p){max-width:64ch!important}
+
+/* 12d. Brand tagline. It is decorative, not information the user acts on, so
+   at the full scale it wrapped to four lines and pushed the actual content
+   down a third of the screen. Held one step below the scale (still well above
+   the 9.5px it shipped at) and given the room to sit on two lines. */
+body.dm-ui33 .sm-v16-brand-sub{font-size:12.5px!important;line-height:1.35!important;letter-spacing:.2px!important}
+body.dm-ui33 .sm-v16-brand-name{font-size:24px!important;line-height:1.1!important}
+body.dm-ui33 .sm-v16-brand>div{flex:1 1 60%}
+@media(max-width:389px){body.dm-ui33 .sm-v16-brand-mode{font-size:11px!important;padding:6px 9px!important}}
+
+/* ---------- 13. Let long names wrap instead of being cut ---------- */
+/* Several headings were truncated in JS with a bare `.slice(0, n)` and no
+   ellipsis, so they stopped mid-word: "4. Metabolic response, wound". The
+   curriculum's own phase names run to 54 characters. The JS truncation has
+   been removed; these rules give the text somewhere to go.
+
+   A first attempt here forced the trailing count to `white-space:nowrap;
+   flex:0 0 auto` and set the label to wrap. That made it worse — `.row-top`
+   is a flex row whose children default to `min-width:auto`, so nothing could
+   shrink and the rows overflowed the card (35 geometry findings, up from 0).
+   The working version lets the ROW wrap and lets both children shrink,
+   rather than dictating how each child behaves. */
+body.dm-ui33 :is(.row-top,.trow .row-top){flex-wrap:wrap!important;align-items:baseline!important}
+body.dm-ui33 :is(.row-top,.trow) :is(.lbl,.muted,.sm,span){min-width:0;overflow-wrap:anywhere}
+body.dm-ui33 :is(.row-top,.trow) .lbl{flex:1 1 60%;white-space:normal!important;line-height:1.35}
+
+/* 13a. Calendar month arrows were 30px wide against a 44px minimum. They are
+   plain `.btn.sm` buttons carrying a single chevron, identified by their
+   aria-label rather than a class of their own. */
+body.dm-ui33 button[aria-label="Previous month"],
+body.dm-ui33 button[aria-label="Next month"]{
+  min-width:44px!important;min-height:44px!important;
+  display:inline-flex!important;align-items:center;justify-content:center;
+  font-size:19px!important;padding:8px!important}
+
+/* 13b. `.sm-v26-topic` cards on the Syllabus. These never rendered before
+   V35.3 — the Current phase grid was filtering on an exam style rather than a
+   curriculum phase and always came back empty — so their contrast had never
+   been measured. The card is a light paper tile, and its meta/signal lines
+   inherited ink chosen for a dark surface. */
+body.dm-ui33 .sm-v26-topic{background:#FFFCF6!important;color:#241A18!important;border-color:#E2D6C6!important}
+body.dm-ui33 .sm-v26-topic .topic-name{color:#241A18!important}
+body.dm-ui33 .sm-v26-topic .topic-meta{color:#5A4B48!important}
+body.dm-ui33 .sm-v26-topic .topic-signal{color:#6B4E08!important}
+body.dm-ui33 .sm-v26-topic .topic-progress{background:#EBE2D4!important}
+body.dm-ui33[data-sm-mode="night"] .sm-v26-topic{background:#241316!important;border-color:#4A2B30!important;color:#EFE2D6!important}
+body.dm-ui33[data-sm-mode="night"] .sm-v26-topic .topic-name{color:#FFF3E4!important}
+body.dm-ui33[data-sm-mode="night"] .sm-v26-topic .topic-meta{color:#BCA79C!important}
+body.dm-ui33[data-sm-mode="night"] .sm-v26-topic .topic-signal{color:#F3D9A6!important}
+body.dm-ui33[data-sm-mode="night"] .sm-v26-topic .topic-progress{background:#33191E!important}
+
+/* Visually-hidden heading. Kept in the accessibility tree and in the document
+   flow for screen readers, but takes no visual space. Not display:none and not
+   visibility:hidden — both remove it from the accessibility tree entirely,
+   which would defeat the point. */
+body.dm-ui33 .sm-a11y-h1{
+  position:absolute!important;width:1px!important;height:1px!important;
+  margin:-1px!important;padding:0!important;border:0!important;
+  clip:rect(0 0 0 0)!important;clip-path:inset(50%)!important;
+  overflow:hidden!important;white-space:nowrap!important}
+
+/* Section headings are <h2> (they sit directly under the per-screen <h1>), but
+   they carry no class, so they were relying on the browser's default <h3>
+   sizing. Renaming them for correct document structure would have made them
+   visibly larger, so the former h3 defaults are pinned explicitly here. Size
+   is now stated rather than inherited from whichever tag happened to be used. */
+body.dm-ui33 h2{font-size:1.17em;font-weight:bold;margin:1em 0}
+
+/* ---------- 14. Global search ----------------------------------------
+   A search field fixed above the navigation, expanding upward into a results
+   sheet. Sits above the nav rather than replacing it, because the nav is the
+   only way back to the five main screens and must stay reachable.
+
+   The nav's own offset is unchanged; this bar is positioned relative to it, so
+   the geometry guarantees in tests/ui-geometry.test.js (nav fully on screen,
+   44px touch targets) continue to hold. #app gains the extra bottom padding
+   the bar occupies, or the last card would sit underneath it. */
+body.dm-ui33 #smSearchWrap{
+  position:fixed!important; left:50%; transform:translateX(-50%);
+  /* The nav is 58px of buttons plus its own 10px offset; the bar must clear
+     all of it. At 78px the bar's lower edge sat 14px INSIDE the nav and
+     covered the Today and Learn labels. */
+  bottom:calc(104px + env(safe-area-inset-bottom));
+  width:min(720px,calc(100% - 22px)); z-index:70;
+  display:flex; flex-direction:column; gap:8px; pointer-events:none}
+body.dm-ui33 #smSearchWrap>*{pointer-events:auto}
+@media(max-width:520px){body.dm-ui33 #smSearchWrap{width:calc(100% - 20px)}}
+body.dm-ui33 #app{padding-bottom:calc(178px + env(safe-area-inset-bottom))!important}
+
+body.dm-ui33 .sm-search-bar{
+  display:flex; align-items:center; gap:8px;
+  background:#FFFCF6; border:1px solid #D8CBBA; border-radius:14px;
+  padding:0 12px; min-height:52px;
+  box-shadow:0 8px 24px rgba(53,17,22,.14)}
+body.dm-ui33 .sm-search-icon{color:#8A6410; font-size:19px; line-height:1}
+body.dm-ui33 #smSearchInput{
+  flex:1 1 auto; min-width:0; border:0!important; outline:0; background:transparent!important;
+  font-size:17px!important; color:#241A18!important; min-height:48px; padding:0!important;
+  -webkit-appearance:none; appearance:none}
+body.dm-ui33 #smSearchInput::placeholder{color:#7A6B67!important; opacity:1}
+body.dm-ui33 #smSearchInput::-webkit-search-cancel-button{display:none}
+body.dm-ui33 #smSearchClear{
+  min-width:44px; min-height:44px; border:0; background:transparent;
+  color:#5E5250!important; font-size:22px; line-height:1; cursor:pointer; border-radius:10px}
+body.dm-ui33 #smSearchClear:hover{background:rgba(53,17,22,.06)}
+
+/* Results collapse to nothing until the field is focused, so the bar is a thin
+   strip at rest and never covers content the user is reading. */
+body.dm-ui33 #smSearchResults{
+  display:none; max-height:min(52vh,420px); overflow-y:auto; overscroll-behavior:contain;
+  background:#FFFCF6; border:1px solid #D8CBBA; border-radius:16px; padding:6px;
+  box-shadow:0 14px 40px rgba(53,17,22,.20)}
+body.dm-ui33 #smSearchWrap.open #smSearchResults{display:block}
+body.dm-ui33 .sm-search-hit{
+  display:grid; grid-template-columns:auto 1fr; grid-template-areas:"kind title" "kind sub";
+  gap:2px 10px; width:100%; text-align:left; background:transparent; border:0;
+  border-radius:12px; padding:10px 10px; min-height:52px; cursor:pointer}
+body.dm-ui33 .sm-search-hit+.sm-search-hit{border-top:1px solid #EFE6D8}
+body.dm-ui33 .sm-search-hit:hover{background:rgba(53,17,22,.05)}
+body.dm-ui33 .sm-search-kind{
+  grid-area:kind; align-self:center; font-size:11px; letter-spacing:.4px; text-transform:uppercase;
+  color:#6B4E08!important; background:rgba(138,100,16,.12); border-radius:8px;
+  padding:5px 8px; white-space:nowrap}
+body.dm-ui33 .sm-search-title{grid-area:title; font-size:16px; font-weight:700; color:#241A18!important; overflow-wrap:anywhere}
+body.dm-ui33 .sm-search-sub{grid-area:sub; font-size:13px; color:#5E5250!important; overflow-wrap:anywhere}
+body.dm-ui33 #smSearchBackdrop{display:none}
+body.dm-ui33.sm-search-open #smSearchBackdrop{
+  display:block; position:fixed; inset:0; z-index:65; background:rgba(28,14,16,.34)}
+
+/* Night and Study surfaces, so the bar does not glow white at 1am. */
+body.dm-ui33[data-sm-mode="night"] :is(.sm-search-bar,#smSearchResults){
+  background:#241316!important; border-color:#4A2B30!important}
+body.dm-ui33[data-sm-mode="night"] #smSearchInput{color:#EFE2D6!important}
+body.dm-ui33[data-sm-mode="night"] #smSearchInput::placeholder{color:#BCA79C!important}
+body.dm-ui33[data-sm-mode="night"] .sm-search-title{color:#FFF3E4!important}
+body.dm-ui33[data-sm-mode="night"] :is(.sm-search-sub,.sm-search-hint,#smSearchClear){color:#BCA79C!important}
+body.dm-ui33[data-sm-mode="night"] .sm-search-kind{color:#F3D9A6!important; background:rgba(243,217,166,.14)}
+body.dm-ui33[data-sm-mode="night"] .sm-search-hit+.sm-search-hit{border-top-color:#3A2126}
+body.dm-ui33[data-sm-mode="night"] .sm-search-icon{color:#F3D9A6}
+body.dm-ui33[data-sm-mode="study"] :is(.sm-search-bar,#smSearchResults){background:#FFFCF6!important}
+
+/* 14a. The result rows and the clear button are <button>s, so they inherit the
+   legacy dark maroon button fill from an earlier layer. Unset with !important:
+   without it the rows rendered as dark blocks with near-black titles on them —
+   invisible, and missed by the contrast suite because that suite only scans
+   #app and nav, not the search shell. The suite now covers this panel too. */
+body.dm-ui33 :is(.sm-search-hit,#smSearchClear){
+  background:transparent!important; background-image:none!important;
+  border:0!important; box-shadow:none!important}
+body.dm-ui33 .sm-search-hit+.sm-search-hit{border-top:1px solid #EFE6D8!important}
+body.dm-ui33 .sm-search-hit:hover{background:rgba(53,17,22,.05)!important}
+body.dm-ui33 .sm-search-hit .sm-search-title{color:#241A18!important}
+body.dm-ui33 .sm-search-hit .sm-search-sub{color:#5E5250!important}
+body.dm-ui33 .sm-search-hit .sm-search-kind{
+  color:#6B4E08!important; background:rgba(138,100,16,.12)!important}
+body.dm-ui33 #smSearchClear{color:#5E5250!important}
+body.dm-ui33[data-sm-mode="night"] .sm-search-hit+.sm-search-hit{border-top-color:#3A2126!important}
+body.dm-ui33[data-sm-mode="night"] .sm-search-hit:hover{background:rgba(255,243,228,.07)!important}
+body.dm-ui33[data-sm-mode="night"] .sm-search-hit .sm-search-title{color:#FFF3E4!important}
+body.dm-ui33[data-sm-mode="night"] .sm-search-hit .sm-search-sub{color:#BCA79C!important}
+body.dm-ui33[data-sm-mode="night"] .sm-search-hit .sm-search-kind{
+  color:#F3D9A6!important; background:rgba(243,217,166,.14)!important}
+body.dm-ui33[data-sm-mode="night"] #smSearchClear{color:#BCA79C!important}
+
+/* ---------- 15. Right-hand launcher, no tab bar -----------------------
+   The five-tab bar is gone. Navigation now lives behind a single launcher
+   pinned bottom-right, which opens a panel containing the search field and a
+   grid of every destination in the app.
+
+   The tradeoff is real and worth stating: the five main screens cost two taps
+   instead of one. It is mitigated by opening straight onto the full
+   destination grid — no typing required — so the second tap is always visible
+   rather than requiring the user to think of a search term first.
+
+   Rules 1 and 14 positioned things relative to a nav that no longer exists,
+   so the offsets below supersede them. #app reclaims the bar's height. */
+body.dm-ui33 #smSearchWrap{
+  left:auto!important; right:12px!important; transform:none!important;
+  bottom:calc(12px + env(safe-area-inset-bottom))!important;
+  width:auto!important; align-items:flex-end!important; gap:10px!important}
+body.dm-ui33 #app{padding-bottom:calc(96px + env(safe-area-inset-bottom))!important}
+
+/* Launcher: a 60px circle, comfortably over the 44px minimum and reachable by
+   a right thumb, which is where the request put it. */
+body.dm-ui33 #smSearchLauncher{
+  position:relative; align-self:flex-end;
+  width:60px!important; height:60px!important; min-width:60px; min-height:60px;
+  border-radius:50%!important; border:1px solid #8A6410!important;
+  background:linear-gradient(135deg,#00706A,#00514D)!important;
+  color:#FFF8EC!important; font-size:25px!important; line-height:1;
+  display:flex!important; align-items:center; justify-content:center;
+  box-shadow:0 10px 26px rgba(53,17,22,.30)!important; cursor:pointer}
+body.dm-ui33 #smSearchLauncher:active{transform:scale(.96)}
+body.dm-ui33 .sm-launch-icon{transform:rotate(0deg); display:block}
+body.dm-ui33 #smSearchWrap.open .sm-launch-icon{opacity:.85}
+/* The due-count badge moved off the old Practice tab onto the launcher; it was
+   the only thing in the bar carrying live information. */
+
+/* Panel sits above the launcher and spans the screen, since the destination
+   grid needs the width. */
+body.dm-ui33 #smSearchPanel{
+  display:none; width:min(560px,calc(100vw - 24px));
+  flex-direction:column; gap:8px}
+body.dm-ui33 #smSearchWrap.open #smSearchPanel{display:flex}
+body.dm-ui33 #smSearchResults{max-height:min(62vh,540px)}
+
+/* Destination grid: two columns, each a full-height target. */
+body.dm-ui33 .sm-search-group{
+  font-size:11px; letter-spacing:.6px; text-transform:uppercase;
+  color:#6B4E08!important; padding:10px 8px 4px; font-weight:700}
+body.dm-ui33 .sm-search-grid{
+  display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px; padding:0 4px 6px}
+body.dm-ui33 .sm-search-dest{
+  display:flex; flex-direction:column; gap:2px; align-items:flex-start; text-align:left;
+  min-height:56px; padding:9px 10px; border-radius:12px;
+  background:#FBF6EC!important; border:1px solid #E2D6C6!important; cursor:pointer}
+body.dm-ui33 .sm-search-dest:hover{background:rgba(53,17,22,.06)!important}
+body.dm-ui33 .sm-dest-label{font-size:15px; font-weight:700; color:#241A18!important; overflow-wrap:anywhere}
+body.dm-ui33 .sm-dest-sub{font-size:12px; color:#5E5250!important; overflow-wrap:anywhere}
+@media(max-width:359px){body.dm-ui33 .sm-search-grid{grid-template-columns:1fr}}
+
+body.dm-ui33[data-sm-mode="night"] #smSearchLauncher{
+  background:linear-gradient(135deg,#00514D,#053B39)!important; border-color:#8A6410!important}
+body.dm-ui33[data-sm-mode="night"] .sm-search-dest{
+  background:#2C181C!important; border-color:#553137!important}
+body.dm-ui33[data-sm-mode="night"] .sm-search-dest:hover{background:rgba(255,243,228,.07)!important}
+body.dm-ui33[data-sm-mode="night"] .sm-dest-label{color:#FFF3E4!important}
+body.dm-ui33[data-sm-mode="night"] .sm-dest-sub{color:#BCA79C!important}
+body.dm-ui33[data-sm-mode="night"] .sm-search-group{color:#F3D9A6!important}
+
+/* 15a. render() hides the badge with the `hidden` attribute when nothing is
+   due; `display:flex!important` above was overriding it, so a red "0" sat on
+   the launcher permanently. */
+
+/* ---------- 16. Right-hand rail + permanent search bar ----------------
+   Supersedes the bottom tab bar (rule 1) and the launcher (rule 15).
+
+   Two pieces of fixed chrome now:
+     - a vertical tab rail on the RIGHT edge, always visible while scrolling;
+     - a search field along the BOTTOM, always visible, not something you have
+       to scroll to the end of the page to reach or open from a button first.
+
+   They occupy different edges, so neither covers the other, and #app is inset
+   on both sides by exactly what they take. */
+body.dm-ui33 .railbtn{
+  position:relative; display:flex!important; flex-direction:column; align-items:center;
+  justify-content:center; gap:2px;
+  min-height:52px!important; width:100%; padding:6px 2px!important;
+  border-radius:12px!important; border:1px solid transparent!important;
+  background:transparent!important; color:#CFE7E2!important; cursor:pointer}
+body.dm-ui33 .railbtn .rli{font-size:17px; line-height:1}
+body.dm-ui33 .railbtn .rlb{font-size:10.5px!important; line-height:1.15; letter-spacing:.2px; white-space:nowrap}
+body.dm-ui33 .railbtn.active{
+  background:rgba(247,210,138,.16)!important; color:#FFF8EC!important;
+  border-color:rgba(247,210,138,.55)!important}
+body.dm-ui33 .railbtn:hover{background:rgba(255,255,255,.08)!important}
+body.dm-ui33 .railbtn #badge{
+  position:absolute; top:2px; right:8px; min-width:20px; height:20px; border-radius:10px;
+  background:#9B1C24!important; color:#FFF8EC!important; font-size:11px!important; font-weight:700;
+  display:flex; align-items:center; justify-content:center; padding:0 5px}
+body.dm-ui33 .railbtn #badge[hidden]{display:none!important}
+
+/* Search: pinned to the bottom edge, stopping short of the rail. */
+body.dm-ui33 #smSearchWrap{
+  left:10px!important; right:82px!important; transform:none!important;
+  bottom:calc(10px + env(safe-area-inset-bottom))!important;
+  width:auto!important; align-items:stretch!important; gap:8px!important}
+body.dm-ui33 #smSearchPanel{width:100%}
+body.dm-ui33 #smSearchResults{max-height:min(58vh,480px)}
+/* The bar is always on screen; only the results sheet is conditional. */
+body.dm-ui33 .sm-search-bar{width:100%}
+
+/* Content is inset by both pieces of chrome so nothing hides underneath. */
+body.dm-ui33 #app{
+  padding-right:78px!important;
+  padding-bottom:calc(84px + env(safe-area-inset-bottom))!important}
+body.dm-ui33 .sm-v18-om{right:84px!important}
+
+@media(max-width:359px){
+  body.dm-ui33 .railbtn .rlb{font-size:9.5px!important}
+  body.dm-ui33 #app{padding-right:66px!important}
+  body.dm-ui33 #smSearchWrap{right:70px!important}
+}
+body.dm-ui33[data-sm-mode="night"] .railbtn{color:#BCA79C!important}
+body.dm-ui33[data-sm-mode="night"] .railbtn.active{
+  background:rgba(243,217,166,.14)!important; color:#FFF3E4!important; border-color:#8A6410!important}
+
+/* 16a. The rail takes 72px of width, which pushed the 7-column calendar down to
+   31px per cell on a 375px screen — well under the 44px touch minimum, and the
+   cells are tappable. Give each cell a 44px floor and let the grid scroll
+   horizontally inside its own card, so the page itself never scrolls sideways. */
+body.dm-ui33 :is(.cal,.calgrid){
+  grid-template-columns:repeat(7,minmax(44px,1fr))!important;
+  overflow-x:auto!important; overscroll-behavior-x:contain}
+body.dm-ui33 :is(.calcell,.caldow){min-width:44px!important}
+
+/* ---------- 17. Eleven-tab rail --------------------------------------
+   Supersedes rule 16's spacing. Eight buttons at 52px fit a full-height
+   column comfortably; eleven do not without shrinking, so the rail scrolls
+   internally if a viewport is short, and each button is denser. */
+body.dm-ui33 .railbtn{min-height:44px!important; padding:5px 2px!important}
+body.dm-ui33 .railbtn .rli{font-size:15px}
+body.dm-ui33 .railbtn .rlb{font-size:9.5px!important}
+@media(max-width:359px){body.dm-ui33 .railbtn .rlb{font-size:8.5px!important}}
+/* The due badge moved from Practice to Log \u2014 it belongs on the tab where
+   the count is actually cleared. */
+body.dm-ui33 .railbtn[data-tab="log"] #badge{
+  position:absolute; top:2px; right:6px; min-width:18px; height:18px; border-radius:9px;
+  background:#9B1C24!important; color:#FFF8EC!important; font-size:10px!important; font-weight:700;
+  display:flex; align-items:center; justify-content:center; padding:0 4px}
+body.dm-ui33 .railbtn[data-tab="log"] #badge[hidden]{display:none!important}
+
+/* ---------- 18. Two fixed horizontal bars + floating search ----------
+   Supersedes rules 15-17 (launcher-only, then the single right rail). The
+   rail cost 72px of WIDTH on every screen — about 18% of a 390px phone — for
+   chrome that is used far less often than the content underneath it is
+   scrolled. Splitting into a top and bottom bar costs HEIGHT instead, which
+   is the cheaper trade for an app that is mostly vertical scrolling: content
+   gets the full screen width back.
+
+   Grouping is by frequency, not alphabetical or by feature area: the bottom
+   bar (thumb zone) holds the five screens used every day — Today, My Day,
+   Log, Practice. The top bar holds the secondary destinations —
+   Learn, Progress, Plan, Coach, Setup, Help. Top placement is deliberately
+   reserved for the LESS frequent half: reach is worse at the top of a phone
+   than the bottom, so it should not hold daily-use destinations. */
+body.dm-ui33 #smBarTop, body.dm-ui33 #smBarBottom{
+  position:fixed!important; left:0!important; right:0!important;
+  width:auto!important; max-width:none!important;
+  transform:none!important; margin:0!important; z-index:60;
+  display:flex!important; flex-direction:row!important;
+  background:linear-gradient(180deg,rgba(0,79,75,.97),rgba(0,58,55,.97));
+}
+/* width:auto above is not optional. A bare, unscoped `nav{width:min(760px,
+   calc(100% - 28px))}` survives from the very first bottom-bar layer and
+   applies to ANY <nav> in the document — this is the third time an element-
+   typed rule from a removed component has ambushed the next <nav> added
+   (see LESSONS_LEARNED: the V34 tab bar, the 7.8.0 right rail, now these two
+   bars). left:0;right:0 alone do not stretch a box that also has an explicit
+   width; the width must be overridden directly. */
+body.dm-ui33 #smBarTop{
+  top:0!important; bottom:auto!important;
+  padding:calc(6px + env(safe-area-inset-top)) 4px 6px;
+  border-bottom:1px solid rgba(247,210,138,.35)}
+body.dm-ui33 #smBarBottom{
+  bottom:0!important; top:auto!important;
+  padding:6px 4px calc(6px + env(safe-area-inset-bottom));
+  border-top:1px solid rgba(247,210,138,.35)}
+body.dm-ui33 #smBarTop .railbtn, body.dm-ui33 #smBarBottom .railbtn{
+  flex:1 1 0; min-width:0; min-height:46px!important;
+  display:flex!important; flex-direction:column; align-items:center; justify-content:center;
+  gap:2px; padding:5px 2px!important; border-radius:10px!important; border:1px solid transparent!important;
+  background:transparent!important; color:#CFE7E2!important; cursor:pointer}
+body.dm-ui33 #smBarTop .railbtn .rli, body.dm-ui33 #smBarBottom .railbtn .rli{font-size:15px; line-height:1}
+body.dm-ui33 #smBarTop .railbtn .rlb, body.dm-ui33 #smBarBottom .railbtn .rlb{
+  font-size:9px!important; line-height:1.1; letter-spacing:.1px; white-space:nowrap}
+body.dm-ui33 #smBarTop .railbtn.active, body.dm-ui33 #smBarBottom .railbtn.active{
+  background:rgba(247,210,138,.16)!important; color:#FFF8EC!important; border-color:rgba(247,210,138,.55)!important}
+body.dm-ui33 #smBarTop .railbtn:hover, body.dm-ui33 #smBarBottom .railbtn:hover{background:rgba(255,255,255,.08)!important}
+body.dm-ui33 .railbtn[data-tab="log"] #badge{
+  position:absolute; top:2px; right:6px; min-width:18px; height:18px; border-radius:9px;
+  background:#9B1C24!important; color:#FFF8EC!important; font-size:10px!important; font-weight:700;
+  display:flex; align-items:center; justify-content:center; padding:0 4px}
+body.dm-ui33 .railbtn[data-tab="log"] #badge[hidden]{display:none!important}
+@media(max-width:359px){
+  body.dm-ui33 #smBarTop .railbtn .rlb, body.dm-ui33 #smBarBottom .railbtn .rlb{font-size:8px!important}
+}
+
+/* Content inset on both edges now, not the right. */
+body.dm-ui33 #app{
+  padding-right:0!important;
+  padding-top:calc(66px + env(safe-area-inset-top))!important;
+  padding-bottom:calc(74px + env(safe-area-inset-bottom))!important}
+body.dm-ui33 .sm-v18-om{right:14px!important; top:calc(70px + env(safe-area-inset-top))!important}
+
+/* Floating search launcher, separate from both bars — bottom-right, clear of
+   the bottom bar's height. */
+body.dm-ui33 #smSearchWrap{
+  position:fixed!important; left:auto!important; right:12px!important; transform:none!important;
+  bottom:calc(66px + env(safe-area-inset-bottom))!important; top:auto!important;
+  width:auto!important; z-index:70; display:flex; flex-direction:column; align-items:flex-end; gap:10px}
+body.dm-ui33 #smSearchLauncher{
+  width:52px!important; height:52px!important; min-width:52px; min-height:52px;
+  border-radius:50%!important; border:1px solid #8A6410!important;
+  background:linear-gradient(135deg,#00706A,#00514D)!important; color:#FFF8EC!important;
+  font-size:21px!important; display:flex!important; align-items:center; justify-content:center;
+  box-shadow:0 10px 24px rgba(53,17,22,.30)!important; cursor:pointer}
+body.dm-ui33 #smSearchLauncher:active{transform:scale(.96)}
+body.dm-ui33 #smSearchPanel{display:none; width:min(420px,calc(100vw - 24px)); flex-direction:column; gap:8px}
+body.dm-ui33 #smSearchWrap.open #smSearchPanel{display:flex}
+body.dm-ui33 #smSearchResults{max-height:min(50vh,420px)}
+
+body.dm-ui33[data-sm-mode="night"] #smBarTop, body.dm-ui33[data-sm-mode="night"] #smBarBottom{
+  background:linear-gradient(180deg,rgba(24,10,13,.98),rgba(16,6,8,.98))}
+body.dm-ui33[data-sm-mode="night"] #smBarTop{border-bottom-color:#4A2B30}
+body.dm-ui33[data-sm-mode="night"] #smBarBottom{border-top-color:#4A2B30}
+body.dm-ui33[data-sm-mode="night"] #smBarTop .railbtn, body.dm-ui33[data-sm-mode="night"] #smBarBottom .railbtn{color:#BCA79C!important}
+body.dm-ui33[data-sm-mode="night"] #smBarTop .railbtn.active, body.dm-ui33[data-sm-mode="night"] #smBarBottom .railbtn.active{
+  background:rgba(243,217,166,.14)!important; color:#FFF3E4!important; border-color:#8A6410!important}
+body.dm-ui33[data-sm-mode="night"] #smSearchLauncher{
+  background:linear-gradient(135deg,#00514D,#053B39)!important; border-color:#8A6410!important}
+
+/* ---------- 19. Three contrast defects surfaced by Plan/Settings/Coach
+   finally entering the contrast sweep (they were never in the old 5-tab
+   TABS list) ------------------------------------------------------------
+   All three share one root cause, and it is the SAME landmine already fixed
+   once this session for `nav{width:...}`: a bare, unscoped, !important rule
+   from the pre-dm-ui33 dark theme outranks a later mode-specific rule that
+   never got its own !important. */
+
+/* 19a. .jumplink converted from <a> to <button> when My Day became a tab
+   (data-nav) instead of an in-page anchor. As a <button>, it now matches
+   `button:not(.navbtn),.btn{background:var(--sm-elevated)!important;
+   color:var(--sm-ivory)!important}` — a legacy rule with no dm-ui33 scoping —
+   which paints it dark-on-dark under the .jumplink color rule that assumed a
+   plain, unstyled <a>. */
+body.dm-ui33 .jumplink{background:transparent!important; border:0!important}
+
+/* 19b. .sm-v16-mode (the Focus/Study/Night selector buttons) never actually
+   changed background between modes: `body[data-sm-mode="study"]
+   .sm-v16-mode{background:#F3EEE8}` has no !important, so it always lost to
+   the same unscoped `button:not(.navbtn){background:var(--sm-elevated)
+   !important}`. The paired text-colour rules DID apply (no competing
+   !important there), so study mode showed dark study-appropriate text sitting
+   on the unchanged dark maroon background — a mismatch, not just low
+   contrast on one static colour. */
+body.dm-ui33 .sm-v16-mode{background:#FFFDF8!important; color:#241A18!important; border-color:#E2D6C6!important}
+body.dm-ui33 .sm-v16-mode span{color:#5E5250!important}
+body.dm-ui33 .sm-v16-mode.on{background:linear-gradient(135deg,#00706A,#00514D)!important; color:#FFF8EC!important; border-color:#8A6410!important}
+body.dm-ui33 .sm-v16-mode.on span{color:#E2D2C6!important}
+body.dm-ui33[data-sm-mode="night"] .sm-v16-mode{background:#2C181C!important; color:#EFE2D6!important; border-color:#553137!important}
+body.dm-ui33[data-sm-mode="night"] .sm-v16-mode span{color:#BCA79C!important}
+body.dm-ui33[data-sm-mode="night"] .sm-v16-mode.on{background:linear-gradient(135deg,#00514D,#053B39)!important; border-color:#8A6410!important}
+
+/* 19c. .sm-v16-reading-note had a study-mode override but no Focus (default)
+   one, so Focus fell through to the dark-theme default: light dusty ink on a
+   near-transparent gold wash over the light parchment page — 1.50:1. */
+body.dm-ui33 .sm-v16-reading-note{background:rgba(138,100,16,.08)!important; border-color:rgba(138,100,16,.22)!important; color:#4F4442!important}
+body.dm-ui33[data-sm-mode="night"] .sm-v16-reading-note{background:rgba(243,217,166,.09)!important; border-color:rgba(243,217,166,.22)!important; color:#D8C8BD!important}
+
+/* 19d. `.eyebrow,.drape{color:var(--drape)}` (line 777) colours ANY element
+   carrying the bare class .drape with the light-theme teal, including
+   .big2.drape (Plan's big stat numbers) sitting on a dark night-mode card.
+   Night mode already brightens .eyebrow.drape specifically (rule 8); this
+   covers the bare .drape class the same rules never reached. */
+body.dm-ui33[data-sm-mode="night"] .drape{color:#63D3A2!important}
+
+/* 19e. .rust, .sky and .violet are bare tone classes (line 45, 182, 777) —
+   the same family as .drape and .amber, but unlike those two, neither ever
+   got a dm-ui33 light-mode override OR a night-mode one. .amber already has
+   both (lines 1202, 1230); this brings the other three to parity rather than
+   patching one element at a time as each happens to be found. .big2.rust on
+   Plan ("120h", the feasibility overrun figure) was the instance that
+   surfaced this, at 1.74:1 in night mode; the light-mode default was
+   already passing by chance (--rust's light value happens to read against a
+   light card), but is pinned explicitly here so that stays true rather than
+   accidental. */
+body.dm-ui33 .rust{color:#8E1A22!important}
+body.dm-ui33 .sky{color:#0A5A82!important}
+body.dm-ui33[data-sm-mode="night"] .rust{color:#E8918F!important}
+body.dm-ui33[data-sm-mode="night"] .sky{color:#9FC2E8!important}
+
+/* ---------- 20. Short viewports: reclaim the chrome ------------------
+   Two bars cost a fixed 120px regardless of screen height. That is 14% of a
+   390x844 phone (fine) and 18% of a 375x667 (acceptable) — but 31% of a
+   844x390 landscape screen, leaving only 270px of content. Anyone rotating
+   the phone to read a wide timeline or a table gets a third of the screen
+   eaten by navigation.
+
+   Below 500px of height the labels are dropped and the bars become icon-only,
+   which is the right trade: in landscape the icons are already familiar from
+   portrait use, and content is the scarce resource. Touch targets stay at
+   44px — the labels go, the tap area does not. */
+@media(max-height:500px){
+  body.dm-ui33 #smBarTop .railbtn .rlb, body.dm-ui33 #smBarBottom .railbtn .rlb{display:none}
+  body.dm-ui33 #smBarTop .railbtn, body.dm-ui33 #smBarBottom .railbtn{min-height:44px!important; padding:2px!important}
+  body.dm-ui33 #smBarTop .railbtn .rli, body.dm-ui33 #smBarBottom .railbtn .rli{font-size:17px}
+  body.dm-ui33 #smBarTop{padding:calc(2px + env(safe-area-inset-top)) 4px 2px}
+  body.dm-ui33 #smBarBottom{padding:2px 4px calc(2px + env(safe-area-inset-bottom))}
+  body.dm-ui33 #app{
+    padding-top:calc(52px + env(safe-area-inset-top))!important;
+    padding-bottom:calc(58px + env(safe-area-inset-bottom))!important}
+  body.dm-ui33 #smSearchWrap{bottom:calc(54px + env(safe-area-inset-bottom))!important}
+  body.dm-ui33 #smSearchResults{max-height:min(44vh,240px)}
+}
+
+/* System-health status words. These classes were pruned in the 9.0.0 dead-CSS
+   sweep — correctly, since smSystemHealth() was uncalled at the time and
+   nothing could ever match them. Restored alongside the card itself. */
+body.dm-ui33 .sm-health-ok{color:#08553E!important;font-weight:700}
+body.dm-ui33 .sm-health-bad{color:#7A4705!important;font-weight:700}
+body.dm-ui33[data-sm-mode="night"] .sm-health-ok{color:#63D3A2!important}
+body.dm-ui33[data-sm-mode="night"] .sm-health-bad{color:#F0B45C!important}
+
+/* ===== v10 workflow polish ===== */
+.v10-progress-hero,.v10-practice-hero{display:flex;align-items:center;justify-content:space-between;gap:18px;margin:8px 0 16px;padding:22px;border:1px solid var(--line);border-radius:22px;background:linear-gradient(135deg,rgba(8,122,115,.08),rgba(255,255,255,.72));box-shadow:0 8px 28px rgba(0,0,0,.05)}
+.v10-progress-hero>div{max-width:620px}.v10-progress-hero img{width:110px;height:110px;object-fit:contain;opacity:.92}
+.v10-progress-hero p,.v10-practice-hero p{margin:6px 0 0;color:var(--muted);max-width:620px}.v10-practice-hero{display:block}.v10-log-cta{margin-top:14px;min-height:52px;font-size:18px}
+.v10-section-title{font-weight:800;letter-spacing:.1px}.v10-metrics{gap:10px}.v10-metrics>div{padding:12px;border-radius:14px;background:rgba(255,255,255,.58);border:1px solid var(--line)}
+.v10-metrics b{display:block;font-size:27px;line-height:1.05}.v10-metrics span,.v10-focus-row small{display:block;color:var(--muted);font-size:12px;margin-top:4px}
+.v10-focus-row{display:grid;grid-template-columns:28px 1fr auto;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}.v10-focus-row:last-of-type{border-bottom:0}.v10-rank{display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--line);font-weight:800;font-size:12px}
+.v10-weak{display:grid;grid-template-columns:minmax(130px,1fr) 2fr 42px;gap:10px;align-items:center;margin:10px 0}.v10-weakbar{height:8px;background:var(--line);border-radius:999px;overflow:hidden}.v10-weakbar i{display:block;height:100%;background:var(--rust);border-radius:999px}.v10-weak b{text-align:right}
+.v10-details{margin-top:12px}.v10-details>summary{cursor:pointer;font-weight:750;padding:12px 0}.v10-step{display:grid;grid-template-columns:34px 1fr;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}.v10-step:last-child{border-bottom:0}.v10-step>span{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--drape);color:white;font-weight:800}.v10-step small{display:block;color:var(--muted);margin-top:3px}
+.v10-log-guide{position:sticky;top:8px;z-index:3;display:flex;justify-content:space-between;gap:12px;align-items:center;margin:0 0 12px;padding:11px 14px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);box-shadow:0 5px 18px rgba(0,0,0,.06)}.v10-log-guide b{font-size:14px}.v10-log-guide span{font-size:12px;color:var(--muted);text-align:right}
+@media(max-width:560px){.v10-progress-hero img{width:76px;height:76px}.v10-metrics{grid-template-columns:1fr 1fr!important}.v10-log-guide{display:block}.v10-log-guide span{display:block;text-align:left;margin-top:3px}.v10-focus-row{grid-template-columns:26px 1fr auto}.v10-weak{grid-template-columns:1fr 1.4fr 38px}}
+body[data-sm-mode="night"] .v10-progress-hero,body[data-sm-mode="night"] .v10-practice-hero{background:rgba(50,34,30,.8)}
+body[data-sm-mode="night"] .v10-log-guide{background:rgba(36,27,25,.94)}
+
+/* v11 Adaptive Mastery Engine — additive only; v10.0.1 navigation is retained */
+.v11-next-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.v11-next-head h2{margin:3px 0 4px}.v11-engine-badge{border:1px solid var(--line);border-radius:999px;padding:4px 9px;font-size:11px;font-weight:800;letter-spacing:.08em}.v11-next-main{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-top:14px;padding:14px;border:1px solid var(--line);border-radius:16px;background:var(--paper)}.v11-action{font-size:12px;text-transform:uppercase;letter-spacing:.08em;font-weight:800;color:var(--drape);margin-bottom:4px}.v11-next-main .btn{min-width:128px}.v11-runway{display:flex;justify-content:space-between;gap:12px;margin-top:10px;font-size:12px;color:var(--muted)}.v11-map{display:grid;grid-template-columns:repeat(13,minmax(0,1fr));gap:6px;margin-top:12px}.v11-dot{display:block;aspect-ratio:1;border-radius:50%;border:1px solid var(--line);background:var(--line)}.v11-dot.strong,.v11-legend i.strong{background:#4c8b6b}.v11-dot.unstable,.v11-legend i.unstable{background:#c99438}.v11-dot.weak,.v11-legend i.weak{background:#b5534c}.v11-dot.new,.v11-legend i.new{background:#c9cdd0}.v11-legend{display:flex;flex-wrap:wrap;gap:10px 16px;margin-top:12px;font-size:12px;color:var(--muted)}.v11-legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px}.v11-focus{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}.v11-focus:last-child{border-bottom:0}.v11-focus small{display:block;color:var(--muted);margin-top:2px}@media(max-width:520px){.v11-next-main{align-items:stretch;flex-direction:column}.v11-next-main .btn{width:100%}.v11-runway{flex-direction:column}.v11-map{grid-template-columns:repeat(10,minmax(0,1fr))}}
+/* v11.1 navigation correction: familiar 9-screen structure. */
+body.dm-ui33 #smBarTop .railbtn, body.dm-ui33 #smBarBottom .railbtn{min-height:46px!important}
+body.dm-ui33 .sm-log-hero{border:1px solid rgba(8,122,115,.22);}
+body.dm-ui33 .sm-log-hero h2{margin-bottom:6px}
+body.dm-ui33 .sm-progress-glance .card{min-height:76px}
+
+/* ===== v11.1.1 stability + visibility pass =====
+   Keep the familiar navigation and reduce visual competition. */
+body.dm-ui33 .card{scroll-margin-top:12px}
+body.dm-ui33 .card h2,body.dm-ui33 .card h3{line-height:1.18}
+body.dm-ui33 .btn{min-height:44px}
+body.dm-ui33 .btn.solid{font-weight:850;box-shadow:0 4px 12px rgba(0,0,0,.08)}
+body.dm-ui33 input,body.dm-ui33 select,body.dm-ui33 textarea{min-height:44px;font-size:16px}
+body.dm-ui33 .v10-progress-hero{padding:18px 20px;margin-bottom:12px}
+body.dm-ui33 .v10-progress-hero .sm-v26-title{font-size:28px}
+body.dm-ui33 .v10-metrics{gap:8px}
+body.dm-ui33 .v10-metrics>div{min-height:72px;display:flex;flex-direction:column;justify-content:center}
+body.dm-ui33 .v10-metrics b{font-size:24px}
+body.dm-ui33 .v10-details{margin-top:6px}
+body.dm-ui33 .v10-details>summary{min-height:44px;display:flex;align-items:center}
+body.dm-ui33 .v10-log-guide{position:relative;top:auto}
+body.dm-ui33 .v11-next-main{background:var(--paper)}
+body.dm-ui33 .v11-engine-badge{opacity:.72}
+@media(max-width:560px){
+  body.dm-ui33 .v10-progress-hero{padding:16px}
+  body.dm-ui33 .v10-progress-hero .sm-v26-title{font-size:24px}
+  body.dm-ui33 .v10-metrics b{font-size:22px}
+  body.dm-ui33 .v10-metrics span{font-size:12px}
+}
+/* v11.1.2 Help & Feedback */
+.help-hero h2{margin:.2rem 0 .4rem;font-size:clamp(1.25rem,4vw,1.7rem)}
+.help-steps{display:grid;gap:0;padding:0;overflow:hidden}
+.help-step{display:grid;grid-template-columns:36px 1fr;gap:12px;padding:14px 16px;border-bottom:1px solid var(--line,#eadfce);align-items:start}
+.help-step:last-child{border-bottom:0}.help-num{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--maroon,#7a1f2b);color:#fff;font-weight:800}
+.help-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.help-item{padding:12px;border:1px solid var(--line,#eadfce);border-radius:12px;display:flex;flex-direction:column;gap:4px;min-height:68px}
+.help-feedback{width:100%;box-sizing:border-box;margin-top:8px;border:1px solid var(--line,#cfc2b0);border-radius:12px;padding:12px;font:inherit;resize:vertical;background:inherit;color:inherit}
+.help-feedback-actions{margin-top:10px;gap:10px}.help-feedback-actions select{min-height:40px;border-radius:10px;padding:0 8px}.help-saved{margin-top:10px}.help-saved-row{padding:10px 0;border-top:1px solid var(--line,#eadfce)}
+@media(max-width:600px){.help-grid{grid-template-columns:1fr}.help-step{padding:13px 12px}}
+
+/* v11.1.3 AI feedback transfer */
+.help-ai-card{border-style:dashed}.help-export-actions{gap:6px;flex-wrap:wrap}.help-export-actions .btn{min-height:40px}@media(max-width:600px){.help-export-actions .btn{flex:1;min-width:0}}
+
+/* v13 usability cleanup: Help/feedback is an operational screen, not a dense dashboard. */
+body.dm-ui33 .help-hero{padding:18px!important}
+body.dm-ui33 .help-steps{display:grid;gap:10px}
+body.dm-ui33 .help-step{display:grid;grid-template-columns:36px 1fr;gap:12px;align-items:start;padding:12px 0;border-bottom:1px solid rgba(11,98,94,.12)}
+body.dm-ui33 .help-step:last-child{border-bottom:0}
+body.dm-ui33 .help-num{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:16px;border:1px solid rgba(11,98,94,.25)}
+body.dm-ui33 .help-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+body.dm-ui33 .help-item{min-height:64px;padding:11px;border:1px solid rgba(11,98,94,.13);border-radius:12px;display:flex;flex-direction:column;gap:4px}
+body.dm-ui33 .help-feedback{width:100%;min-height:112px;box-sizing:border-box;font:inherit;font-size:16px;line-height:1.45;padding:12px;border-radius:12px}
+body.dm-ui33 .help-feedback-actions{align-items:center;gap:8px;flex-wrap:wrap;margin-top:10px}
+body.dm-ui33 .help-feedback-actions select{min-height:44px;font-size:15px}
+body.dm-ui33 .help-export-actions{gap:6px;flex-wrap:wrap;justify-content:flex-end}
+body.dm-ui33 .help-ai-card{border-left:4px solid #0B625E}
+body.dm-ui33 .help-saved{display:grid;gap:8px;margin-top:12px}
+body.dm-ui33 .help-saved-row{padding:10px 0;border-top:1px solid rgba(11,98,94,.10)}
+@media(max-width:520px){body.dm-ui33 .help-grid{grid-template-columns:1fr}.help-export-actions{justify-content:flex-start!important}}
+
+
+/* ===== V13.2.3 — five fixed bottom tabs ===== */
+body.dm-ui33 #smBarTop{display:none!important}
+body.dm-ui33 #smBarBottom{position:fixed!important;left:0!important;right:0!important;bottom:0!important;top:auto!important;width:auto!important;max-width:none!important;transform:none!important;margin:0!important;z-index:60;display:flex!important;flex-direction:row!important;padding:5px 4px calc(5px + env(safe-area-inset-bottom))!important;background:linear-gradient(180deg,rgba(0,79,75,.98),rgba(0,58,55,.98));border-top:1px solid rgba(247,210,138,.35)}
+body.dm-ui33 #smBarBottom .railbtn{position:relative;flex:1 1 0;min-width:0;min-height:48px!important;display:flex!important;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:5px 2px!important;border-radius:10px!important;border:1px solid transparent!important;background:transparent!important;color:#CFE7E2!important}
+body.dm-ui33 #smBarBottom .railbtn .rli{font-size:16px;line-height:1}
+body.dm-ui33 #smBarBottom .railbtn .rlb{font-size:10px!important;line-height:1.1;white-space:nowrap}
+body.dm-ui33 #smBarBottom .railbtn.active{background:rgba(247,210,138,.16)!important;color:#FFF8EC!important;border-color:rgba(247,210,138,.55)!important}
+body.dm-ui33 #smBarBottom .railbtn #badge{position:absolute;top:1px;right:calc(50% - 25px);min-width:18px;height:18px;border-radius:9px;background:#9B1C24!important;color:#FFF8EC!important;font-size:10px!important;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 4px}
+body.dm-ui33 #smBarBottom .railbtn #badge[hidden]{display:none!important}
+body.dm-ui33 #app{padding-top:calc(10px + env(safe-area-inset-top))!important;padding-bottom:calc(72px + env(safe-area-inset-bottom))!important;padding-right:0!important}
+.sm-more-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:14px 0}
+.sm-more-item{display:flex;align-items:center;gap:10px;text-align:left;padding:15px 13px;border:1px solid var(--line,#dce5e4);border-radius:15px;background:var(--paper,#fff);color:var(--ink,#17232b);min-height:72px;cursor:pointer}
+.sm-more-item b{display:block;font-size:15px}.sm-more-item small{display:block;color:var(--muted,#6d777a);margin-top:3px;line-height:1.25}
+.sm-more-item .simple-icon{width:30px;height:30px;display:grid;place-items:center;border-radius:9px;background:var(--drape,#7a1f2b);color:#fff;flex:0 0 auto;font-weight:800}
+@media(max-width:520px){.sm-more-grid{grid-template-columns:1fr}}
+body.dm-ui33[data-sm-mode="night"] #smBarBottom{background:linear-gradient(180deg,rgba(24,10,13,.98),rgba(16,6,8,.98));border-top-color:#4A2B30}
+body.dm-ui33[data-sm-mode="night"] #smBarBottom .railbtn{color:#BCA79C!important}
+body.dm-ui33[data-sm-mode="night"] #smBarBottom .railbtn.active{background:rgba(243,217,166,.14)!important;color:#FFF3E4!important;border-color:#8A6410!important}
+
+/* ===== v13.2.4 simplified five-tab UI ===== */
+body.dm-ui33{padding-bottom:76px!important}
+body.dm-ui33 #smBarBottom{background:rgba(255,253,248,.98)!important;border-top:1px solid #D9DED8!important;box-shadow:0 -8px 24px rgba(20,50,48,.08)!important;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+body.dm-ui33 #smBarBottom .railbtn{color:#61716E!important;border-radius:12px!important;border:1px solid transparent!important;background:transparent!important;min-height:52px!important}
+body.dm-ui33 #smBarBottom .railbtn.active{color:#087A73!important;background:rgba(8,122,115,.08)!important;border-color:rgba(8,122,115,.18)!important}
+body.dm-ui33 #smBarBottom .railbtn .rli{font-size:16px!important}
+body.dm-ui33 #smBarBottom .railbtn .rlb{font-size:10px!important;font-weight:700!important}
+.dm24-header{margin:12px 0 14px;padding:18px 18px 16px;border:1px solid #D9DED8;border-radius:20px;background:#FFFDF8;box-shadow:0 5px 18px rgba(23,59,56,.05)}
+.dm24-kicker{font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:800;color:#087A73;margin-bottom:5px}
+.dm24-header h2{margin:0;color:#173B38;font-size:25px;line-height:1.12}
+.dm24-header p{margin:7px 0 0;color:#61716E;font-size:13px;line-height:1.45}
+.dm24-today-meta{display:flex;flex-wrap:wrap;gap:7px;margin:0 2px 12px}
+.dm24-today-meta span{padding:6px 9px;border-radius:999px;background:#EEF4F1;color:#365B57;font-size:11px;font-weight:700}
+.dm24-stats,.dm24-progress-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:10px 0 14px}
+.dm24-stat{padding:12px 10px;border:1px solid #D9DED8;border-radius:15px;background:#FFFDF8;min-width:0}
+.dm24-stat-value{font-size:19px;font-weight:800;color:#173B38;line-height:1.1}
+.dm24-stat-label{margin-top:4px;font-size:10px;font-weight:800;color:#61716E;text-transform:uppercase;letter-spacing:.04em}
+.dm24-stat-note{margin-top:3px;font-size:9px;color:#7A8784;line-height:1.25}
+.dm24-focus{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border-radius:15px;background:#EEF4F1;border:1px solid #D5E4DF;margin:10px 0 14px;color:#173B38}
+.dm24-focus b{font-size:12px}.dm24-focus span{font-size:12px;font-weight:700;text-align:right}
+.dm24-divider{height:1px;background:#D9DED8;margin:16px 0}
+.dm24-section-title{margin:16px 2px 8px;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#61716E}
+.dm24-topic-list,.dm24-phase-list{border:1px solid #D9DED8;border-radius:17px;background:#FFFDF8;overflow:hidden}
+.dm24-topic-row,.dm24-phase-list summary{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:12px 14px;border-bottom:1px solid #E7EBE7}
+.dm24-topic-row:last-child{border-bottom:0}.dm24-topic-row b{display:block;color:#173B38;font-size:13px}.dm24-topic-row span{display:block;margin-top:3px;color:#7A8784;font-size:10px}.dm24-topic-pct{font-weight:800!important;color:#087A73!important;white-space:nowrap}
+.dm24-phase-list details:last-child summary{border-bottom:0}.dm24-phase-list summary{cursor:pointer;list-style:none}.dm24-phase-list summary::-webkit-details-marker{display:none}.dm24-phase-list summary span{font-size:10px;color:#7A8784}.dm24-phase-topics{padding:0 14px 10px}.dm24-phase-topics>div{padding:8px 0;border-top:1px solid #EEF0EE}.dm24-phase-topics b{display:block;font-size:12px;color:#365B57}.dm24-phase-topics span{display:block;margin-top:2px;font-size:10px;color:#7A8784}
+.dm24-next-action{margin:12px 0 16px;padding:17px 16px;border:1px solid #BFD8D1;border-radius:18px;background:#F3F8F6;box-shadow:0 2px 10px rgba(23,59,56,.06)}.dm24-session-active{margin:12px 0 16px;padding:16px;border:1px solid #D7C6A2;border-radius:18px;background:#FBF7EE;box-shadow:0 2px 10px rgba(80,60,25,.05)}.dm24-session-kicker{font-size:10px;font-weight:900;letter-spacing:.12em;color:#8A641E}.dm24-session-title{margin-top:5px;font-size:19px;line-height:1.25;font-weight:900;color:#173B38}.dm24-session-meta{margin-top:6px;font-size:12px;font-weight:800;color:#61716E}.dm24-session-track{height:7px;margin:12px 0;border-radius:99px;background:#E6DED0;overflow:hidden}.dm24-session-track span{display:block;height:100%;border-radius:99px;background:#087A73}.dm24-session-stop{min-height:44px;border:1px solid #CDD4CF;border-radius:12px;background:#FFFDF8;color:#365B57;font-weight:800;padding:0 14px;touch-action:manipulation}.dm24-session-note{margin:8px 0 0;font-size:11px;line-height:1.4;color:#61716E}.dm24-next-kicker{font-size:10px;font-weight:900;letter-spacing:.12em;color:#087A73}.dm24-next-title{margin-top:5px;font-size:20px;line-height:1.2;font-weight:900;color:#173B38}.dm24-next-meta{margin-top:7px;font-size:12px;font-weight:800;color:#365B57}.dm24-next-reason{margin-top:7px;font-size:11px;line-height:1.4;color:#61716E}.dm24-next-button{width:100%;min-height:48px;border:0;border-radius:13px;background:#087A73;color:#FFFDF8;font-weight:900;font-size:15px;touch-action:manipulation}.dm24-next-small{display:block;margin:9px auto 0;border:0;background:transparent;color:#61716E;font-size:11px;font-weight:700;padding:6px 8px;touch-action:manipulation}.dm24-next-button:active{transform:scale(.995)}
+.dm24-action-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:10px 0 14px}.dm24-primary-action{min-height:74px;text-align:left;padding:13px 14px;border-radius:16px;border:1px solid #D5E4DF;background:#EEF4F1;color:#173B38}.dm24-primary-action:first-child{background:#087A73;color:#FFFDF8;border-color:#087A73}.dm24-primary-action b{display:block;font-size:14px}.dm24-primary-action span{display:block;margin-top:5px;font-size:10px;opacity:.82}
+.dm24-back{margin:12px 0}.dm24-detail{margin:14px 0}.dm24-detail>summary{cursor:pointer;padding:11px 13px;border:1px solid #D9DED8;border-radius:14px;background:#FFFDF8;color:#365B57;font-size:12px;font-weight:800}.dm24-mini-list{display:grid;grid-template-columns:1fr 1fr;gap:6px}.dm24-mini-list>div{display:flex;justify-content:space-between;gap:8px;padding:7px 8px;border:1px solid #E2E7E3;border-radius:9px;font-size:10px;color:#61716E}.dm24-mini-list>div span:last-child{font-weight:800;color:#173B38}
+.dm24-more-group{margin-top:14px}.dm24-more-group:first-of-type{margin-top:0}.dm24-more-tip{margin-top:14px;padding:12px 14px;border-radius:14px;background:#F1EDE4;color:#61716E;font-size:11px;line-height:1.45}.dm24-more-list button{cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:rgba(8,122,115,.12)}.dm24-more-list button:active{transform:scale(.995)}
+.dm24-more-list{display:grid;gap:9px}.dm24-more-list button{display:block;width:100%;text-align:left;padding:14px;border:1px solid #D9DED8;border-radius:16px;background:#FFFDF8;color:#173B38}.dm24-more-list b{display:block;font-size:14px}.dm24-more-list span{display:block;margin-top:4px;font-size:11px;color:#61716E}.dm24-note{margin-top:14px;padding:12px 14px;border-radius:14px;background:#F1EDE4;color:#61716E;font-size:11px;line-height:1.45}
+@media (max-width:360px){.dm24-stats,.dm24-progress-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.dm24-next-action{margin:12px 0 16px;padding:17px 16px;border:1px solid #BFD8D1;border-radius:18px;background:#F3F8F6;box-shadow:0 2px 10px rgba(23,59,56,.06)}.dm24-session-active{margin:12px 0 16px;padding:16px;border:1px solid #D7C6A2;border-radius:18px;background:#FBF7EE;box-shadow:0 2px 10px rgba(80,60,25,.05)}.dm24-session-kicker{font-size:10px;font-weight:900;letter-spacing:.12em;color:#8A641E}.dm24-session-title{margin-top:5px;font-size:19px;line-height:1.25;font-weight:900;color:#173B38}.dm24-session-meta{margin-top:6px;font-size:12px;font-weight:800;color:#61716E}.dm24-session-track{height:7px;margin:12px 0;border-radius:99px;background:#E6DED0;overflow:hidden}.dm24-session-track span{display:block;height:100%;border-radius:99px;background:#087A73}.dm24-session-stop{min-height:44px;border:1px solid #CDD4CF;border-radius:12px;background:#FFFDF8;color:#365B57;font-weight:800;padding:0 14px;touch-action:manipulation}.dm24-session-note{margin:8px 0 0;font-size:11px;line-height:1.4;color:#61716E}.dm24-next-kicker{font-size:10px;font-weight:900;letter-spacing:.12em;color:#087A73}.dm24-next-title{margin-top:5px;font-size:20px;line-height:1.2;font-weight:900;color:#173B38}.dm24-next-meta{margin-top:7px;font-size:12px;font-weight:800;color:#365B57}.dm24-next-reason{margin-top:7px;font-size:11px;line-height:1.4;color:#61716E}.dm24-next-button{width:100%;min-height:48px;border:0;border-radius:13px;background:#087A73;color:#FFFDF8;font-weight:900;font-size:15px;touch-action:manipulation}.dm24-next-small{display:block;margin:9px auto 0;border:0;background:transparent;color:#61716E;font-size:11px;font-weight:700;padding:6px 8px;touch-action:manipulation}.dm24-next-button:active{transform:scale(.995)}
+.dm24-action-grid{grid-template-columns:1fr}.dm24-header h2{font-size:22px}}
+
+/* ===== v13.2.5 navigation fix ===== */
+body.dm-ui33 #smBarBottom{display:flex!important;grid-template-columns:repeat(4,1fr)!important}
+body.dm-ui33 #smBarBottom .railbtn{flex:1 1 0!important;width:25%!important;min-width:0!important;cursor:pointer!important;touch-action:manipulation!important}
+
+/* ===== V14 visibility + simplification pass ===== */
+body.dm-ui33{
+  --v14-text:#173B38;
+  --v14-muted:#536764;
+  --v14-surface:#FFFDF8;
+  --v14-border:#CDD7D3;
+}
+body.dm-ui33 #app{
+  max-width:760px;
+  margin:0 auto;
+  padding-left:max(12px,env(safe-area-inset-left))!important;
+  padding-right:max(12px,env(safe-area-inset-right))!important;
+  padding-bottom:calc(92px + env(safe-area-inset-bottom))!important;
+}
+body.dm-ui33 .dm24-header{
+  box-shadow:none;
+  border-color:var(--v14-border);
+}
+body.dm-ui33 .dm24-header h2,
+body.dm-ui33 .dm24-stat-value,
+body.dm-ui33 .dm24-focus,
+body.dm-ui33 .dm24-topic-row b,
+body.dm-ui33 .dm24-phase-list b{
+  color:var(--v14-text);
+}
+body.dm-ui33 .dm24-header p,
+body.dm-ui33 .dm24-stat-note,
+body.dm-ui33 .dm24-topic-row span,
+body.dm-ui33 .dm24-phase-list span{
+  color:var(--v14-muted);
+}
+body.dm-ui33 .dm24-primary-action,
+body.dm-ui33 .dm24-more-list button,
+body.dm-ui33 .dm24-action-grid button{
+  min-height:64px!important;
+  touch-action:manipulation;
+}
+body.dm-ui33 .dm24-more-list{
+  gap:10px!important;
+}
+body.dm-ui33 .dm24-more-list button{
+  text-align:left;
+  padding:14px 16px!important;
+}
+body.dm-ui33 .dm24-more-list button b{
+  display:block;
+  font-size:15px;
+  color:var(--v14-text);
+}
+body.dm-ui33 .dm24-more-list button span{
+  display:block;
+  margin-top:3px;
+  color:var(--v14-muted);
+  font-size:12px;
+}
+body.dm-ui33 .dm24-stats{
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+}
+body.dm-ui33 .dm24-stat{
+  min-height:70px;
+}
+body.dm-ui33 .dm24-topic-row,
+body.dm-ui33 .dm24-phase-list details{
+  min-height:58px;
+}
+body.dm-ui33 #smBarBottom{
+  min-height:72px!important;
+  padding-bottom:env(safe-area-inset-bottom)!important;
+}
+body.dm-ui33 #smBarBottom .railbtn{
+  min-height:60px!important;
+  padding:7px 4px!important;
+}
+body.dm-ui33 #smBarBottom .railbtn .rli{
+  font-size:18px!important;
+}
+body.dm-ui33 #smBarBottom .railbtn .rlb{
+  font-size:11px!important;
+}
+body.dm-ui33 .dm24-detail summary{
+  min-height:52px;
+  display:flex;
+  align-items:center;
+}
+body.dm-ui33 .dm24-next-action{margin:12px 0 16px;padding:17px 16px;border:1px solid #BFD8D1;border-radius:18px;background:#F3F8F6;box-shadow:0 2px 10px rgba(23,59,56,.06)}.dm24-session-active{margin:12px 0 16px;padding:16px;border:1px solid #D7C6A2;border-radius:18px;background:#FBF7EE;box-shadow:0 2px 10px rgba(80,60,25,.05)}.dm24-session-kicker{font-size:10px;font-weight:900;letter-spacing:.12em;color:#8A641E}.dm24-session-title{margin-top:5px;font-size:19px;line-height:1.25;font-weight:900;color:#173B38}.dm24-session-meta{margin-top:6px;font-size:12px;font-weight:800;color:#61716E}.dm24-session-track{height:7px;margin:12px 0;border-radius:99px;background:#E6DED0;overflow:hidden}.dm24-session-track span{display:block;height:100%;border-radius:99px;background:#087A73}.dm24-session-stop{min-height:44px;border:1px solid #CDD4CF;border-radius:12px;background:#FFFDF8;color:#365B57;font-weight:800;padding:0 14px;touch-action:manipulation}.dm24-session-note{margin:8px 0 0;font-size:11px;line-height:1.4;color:#61716E}.dm24-next-kicker{font-size:10px;font-weight:900;letter-spacing:.12em;color:#087A73}.dm24-next-title{margin-top:5px;font-size:20px;line-height:1.2;font-weight:900;color:#173B38}.dm24-next-meta{margin-top:7px;font-size:12px;font-weight:800;color:#365B57}.dm24-next-reason{margin-top:7px;font-size:11px;line-height:1.4;color:#61716E}.dm24-next-button{width:100%;min-height:48px;border:0;border-radius:13px;background:#087A73;color:#FFFDF8;font-weight:900;font-size:15px;touch-action:manipulation}.dm24-next-small{display:block;margin:9px auto 0;border:0;background:transparent;color:#61716E;font-size:11px;font-weight:700;padding:6px 8px;touch-action:manipulation}.dm24-next-button:active{transform:scale(.995)}
+.dm24-action-grid{
+  gap:10px!important;
+}
+body.dm-ui33 .dm24-primary-action{
+  border-width:1px!important;
+}
+/* Do not let legacy decorative/analytics modules compete with the v14
+   simplified presentation if an older renderer inserts them. */
+body.dm-ui33 .sm-v14-progress,
+body.dm-ui33 .sm-v10-card,
+body.dm-ui33 .sm-v10-grid{
+  max-width:100%;
+}

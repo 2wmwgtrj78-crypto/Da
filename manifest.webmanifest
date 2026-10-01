@@ -1,0 +1,16 @@
+{
+  "name": "Dakshinamurthy",
+  "short_name": "Dakshinamurthy",
+  "description": "Higher Every Hour \u2014 Learn, Practice, Excel: personal INI-SS study companion.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F5EBDD",
+  "theme_color": "#0B625E",
+  "icons": [
+    { "src": "icon.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

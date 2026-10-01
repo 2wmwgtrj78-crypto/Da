@@ -1,0 +1,19 @@
+{
+  "name": "dakshinamurthy",
+  "version": "15.0.0",
+  "private": true,
+  "scripts": {
+    "build": "node build-ui.js",
+    "test": "node tests/smoke.test.js && node tests/conservation.test.js && node tests/intelligence.test.js && node tests/exports.test.js && node tests/backup.test.js && node tests/recovery.test.js && node tests/today-intelligence.test.js",
+    "test:e2e": "node tests/e2e.test.js",
+    "test:e2e:install": "npm install --save-dev playwright && npx playwright install chromium",
+    "test:ui": "node tests/ui-geometry.test.js",
+    "test:all": "npm test && npm run test:e2e && npm run test:ui && npm run test:resilience && npm run test:search",
+    "test:resilience": "node tests/resilience.test.js",
+    "test:search": "node tests/search.test.js",
+    "test:e2e:ci": "npm run test:e2e:install && npm run test:e2e"
+  },
+  "devDependencies": {
+    "playwright": "^1.55.0"
+  }
+}
